@@ -36,7 +36,7 @@ export function GraduateCard({
       className="block bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-5 hover:border-neutral-600 hover:bg-neutral-800 transition-all group"
     >
       <div className="flex items-start gap-4">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -48,7 +48,7 @@ export function GraduateCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-white font-semibold text-base group-hover:text-red-400 transition-colors truncate">
+          <h3 className="text-white font-semibold text-base group-hover:text-blue-400 transition-colors truncate">
             {name}
           </h3>
           <p className="text-neutral-400 text-sm truncate">

@@ -75,3 +75,5 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 |------|---------|
 | Initial | Template created with base setup |
 | Current | Full Egresados Cuba social network implemented |
+| Current | Primary color changed from red to blue across all components |
+| Current | Navbar logo gradient changed from red-500 to blue-800 |

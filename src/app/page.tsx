@@ -52,12 +52,12 @@ export default async function Home() {
   return (
     <main className="min-h-screen">
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-neutral-900 to-blue-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-neutral-900 to-blue-900/20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
               Red Internacional de
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-blue-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-400">
                 {" "}
                 Egresados Cubanos
               </span>
@@ -70,7 +70,7 @@ export default async function Home() {
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/egresados/registro"
-                className="px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-base transition-colors shadow-lg shadow-red-600/20"
+                className="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-base transition-colors shadow-lg shadow-blue-600/20"
               >
                 Unirse a la Red
               </Link>
@@ -139,7 +139,7 @@ export default async function Home() {
             </h2>
             <Link
               href="/directorio"
-              className="text-red-400 hover:text-red-300 text-sm font-medium"
+              className="text-blue-400 hover:text-blue-300 text-sm font-medium"
             >
               Ver todos →
             </Link>
@@ -152,7 +152,7 @@ export default async function Home() {
                 className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-5 hover:border-neutral-600 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
                     {g.photoUrl ? (
                       <img
                         src={g.photoUrl}
@@ -198,7 +198,7 @@ export default async function Home() {
                 className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-5"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
                     {post.graduateName
                       .split(" ")
                       .map((n) => n[0])
@@ -253,7 +253,7 @@ export default async function Home() {
             </p>
             <Link
               href="/egresados/registro"
-              className="inline-block px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors"
+              className="inline-block px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors"
             >
               Registrarme Ahora
             </Link>
@@ -344,7 +344,7 @@ function StatCard({
 
   return (
     <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-4 text-center">
-      <div className="flex justify-center text-red-400 mb-2">{iconMap[icon]}</div>
+      <div className="flex justify-center text-blue-400 mb-2">{iconMap[icon]}</div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="text-xs text-neutral-500 mt-1">{label}</div>
     </div>

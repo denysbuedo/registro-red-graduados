@@ -227,7 +227,7 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 disabled:text-neutral-500 text-white rounded-xl font-semibold transition-colors"
+            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 disabled:text-neutral-500 text-white rounded-xl font-semibold transition-colors"
           >
             {loading ? "Registrando..." : "Completar Registro"}
           </button>
@@ -282,7 +282,7 @@ function InputField({
         placeholder={placeholder}
         min={min}
         max={max}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
       />
     </div>
   );
@@ -308,7 +308,7 @@ function SelectField({
       <select
         name={name}
         required={required}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
       >
         <option value="">Seleccionar...</option>
         {options.map((opt) => (
@@ -341,7 +341,7 @@ function TextAreaField({
         name={name}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm resize-none"
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm resize-none"
       />
     </div>
   );

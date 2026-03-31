@@ -122,7 +122,7 @@ export default function ListasCorreoPage() {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium text-sm transition-colors"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition-colors"
           >
             {showForm ? "Cancelar" : "+ Nueva Lista"}
           </button>
@@ -146,7 +146,7 @@ export default function ListasCorreoPage() {
                     name="name"
                     required
                     placeholder="Ej: Egresados Medicina 2020"
-                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 text-sm"
+                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div>
@@ -156,7 +156,7 @@ export default function ListasCorreoPage() {
                   <input
                     name="description"
                     placeholder="Descripción de la lista..."
-                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 text-sm"
+                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
               </div>
@@ -164,7 +164,7 @@ export default function ListasCorreoPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <select
                   name="filterUniversity"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todas las universidades</option>
                   {universities.map((u) => (
@@ -175,7 +175,7 @@ export default function ListasCorreoPage() {
                 </select>
                 <select
                   name="filterCareer"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todas las carreras</option>
                   {careers.map((c) => (
@@ -186,7 +186,7 @@ export default function ListasCorreoPage() {
                 </select>
                 <select
                   name="filterCountry"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todos los países</option>
                   {countries.map((c) => (
@@ -201,7 +201,7 @@ export default function ListasCorreoPage() {
                   placeholder="Año desde"
                   min={1960}
                   max={2030}
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 />
                 <input
                   name="filterYearTo"
@@ -209,14 +209,14 @@ export default function ListasCorreoPage() {
                   placeholder="Año hasta"
                   min={1960}
                   max={2030}
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 text-white rounded-xl font-medium text-sm transition-colors"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 text-white rounded-xl font-medium text-sm transition-colors"
               >
                 {loading ? "Guardando..." : "Guardar Lista"}
               </button>
@@ -232,7 +232,7 @@ export default function ListasCorreoPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               <select
                 name="filterUniversity"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todas las universidades</option>
                 {universities.map((u) => (
@@ -243,7 +243,7 @@ export default function ListasCorreoPage() {
               </select>
               <select
                 name="filterCareer"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todas las carreras</option>
                 {careers.map((c) => (
@@ -254,7 +254,7 @@ export default function ListasCorreoPage() {
               </select>
               <select
                 name="filterCountry"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todos los países</option>
                 {countries.map((c) => (
@@ -269,7 +269,7 @@ export default function ListasCorreoPage() {
                 placeholder="Año desde"
                 min={1960}
                 max={2030}
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               />
               <input
                 name="filterYearTo"
@@ -277,7 +277,7 @@ export default function ListasCorreoPage() {
                 placeholder="Año hasta"
                 min={1960}
                 max={2030}
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               />
             </div>
             <button

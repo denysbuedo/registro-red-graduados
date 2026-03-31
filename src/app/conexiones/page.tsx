@@ -117,7 +117,7 @@ export default function ConexionesPage() {
                 e.target.value ? parseInt(e.target.value) : null
               )
             }
-            className="w-full sm:w-auto px-4 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500"
+            className="w-full sm:w-auto px-4 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
           >
             <option value="">Seleccionar egresado...</option>
             {graduates.map((g) => (
@@ -148,7 +148,7 @@ export default function ConexionesPage() {
                           href={`/egresados/${c.senderId}`}
                           className="flex items-center gap-3 hover:opacity-80"
                         >
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
                             {c.senderName
                               .split(" ")
                               .map((n: string) => n[0])
@@ -273,7 +273,7 @@ export default function ConexionesPage() {
                         href={`/egresados/${s.id}`}
                         className="flex items-center gap-3 hover:opacity-80"
                       >
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
                           {s.name
                             .split(" ")
                             .map((n) => n[0])
@@ -293,7 +293,7 @@ export default function ConexionesPage() {
                       <button
                         onClick={() => sendConnection(s.id)}
                         disabled={loading}
-                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors"
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors"
                       >
                         Conectar
                       </button>

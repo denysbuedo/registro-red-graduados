@@ -55,10 +55,10 @@ export default async function GraduateProfilePage({
     <main className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-neutral-800/30 border border-neutral-700/50 rounded-2xl overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-red-900/40 to-blue-900/40 relative" />
+          <div className="h-32 bg-gradient-to-r from-blue-900/40 to-blue-900/40 relative" />
           <div className="px-6 pb-6 -mt-12 relative">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-neutral-800 shrink-0 overflow-hidden">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-2xl border-4 border-neutral-800 shrink-0 overflow-hidden">
                 {g.photoUrl ? (
                   <img
                     src={g.photoUrl}

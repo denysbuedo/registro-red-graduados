@@ -11,7 +11,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-red-500 via-white to-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-800 via-white to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 CU
               </span>
@@ -28,7 +28,7 @@ export function Navbar() {
             <NavLink href="/listas-correo">Listas Correo</NavLink>
             <Link
               href="/egresados/registro"
-              className="ml-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+              className="ml-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
             >
               + Registro
             </Link>

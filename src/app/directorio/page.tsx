@@ -76,11 +76,11 @@ export default async function DirectorioPage({
               name="search"
               defaultValue={search}
               placeholder="Buscar por nombre, profesión o biografía..."
-              className="flex-1 px-4 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 text-sm"
+              className="flex-1 px-4 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
             />
             <button
               type="submit"
-              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium text-sm transition-colors"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition-colors"
             >
               Buscar
             </button>
@@ -90,7 +90,7 @@ export default async function DirectorioPage({
             <select
               name="country"
               defaultValue={country}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
             >
               <option value="">Todos los países</option>
               {countriesResult.map((c) => (
@@ -103,7 +103,7 @@ export default async function DirectorioPage({
             <select
               name="university"
               defaultValue={university}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
             >
               <option value="">Todas las universidades</option>
               {universitiesResult.map((u) => (
@@ -116,7 +116,7 @@ export default async function DirectorioPage({
             <select
               name="career"
               defaultValue={career}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
             >
               <option value="">Todas las carreras</option>
               {careersResult.map((c) => (
@@ -133,7 +133,7 @@ export default async function DirectorioPage({
               placeholder="Año desde"
               min={1960}
               max={2030}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
             />
 
             <input
@@ -143,7 +143,7 @@ export default async function DirectorioPage({
               placeholder="Año hasta"
               min={1960}
               max={2030}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
             />
           </div>
 
@@ -154,7 +154,7 @@ export default async function DirectorioPage({
               </span>
               <a
                 href="/directorio"
-                className="text-red-400 hover:text-red-300 text-sm"
+                className="text-blue-400 hover:text-blue-300 text-sm"
               >
                 Limpiar filtros
               </a>
