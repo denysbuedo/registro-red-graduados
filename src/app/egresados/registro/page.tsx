@@ -1,0 +1,348 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const COUNTRIES = [
+  "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
+  "Costa Rica", "Cuba", "Ecuador", "El Salvador", "España", "Estados Unidos",
+  "Francia", "Guatemala", "Guyana", "Haití", "Honduras", "Italia",
+  "Jamaica", "México", "Nicaragua", "Panamá", "Paraguay", "Perú",
+  "Puerto Rico", "República Dominicana", "Suriname", "Trinidad y Tobago",
+  "Uruguay", "Venezuela", "Alemania", "Reino Unido", "Angola", "Mozambique",
+  "Sudáfrica", "Nigeria", "Argelia", "China", "Japón", "India",
+  "Australia", "Otro",
+];
+
+const UNIVERSITIES = [
+  "Universidad de La Habana",
+  "Universidad de Oriente",
+  "Universidad Central de Las Villas",
+  "Universidad Marta Abreu de Las Villas",
+  "Universidad de Camagüey",
+  "Universidad de Pinar del Río",
+  "Universidad de Holguín",
+  "Universidad de Granma",
+  "Universidad de Sancti Spíritus",
+  "Universidad de Matanzas",
+  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
+  "Universidad de Ciencias Médicas de La Habana",
+  "Escuela Internacional de Educación Física y Deportes",
+  "Instituto Superior de Arte",
+  "Universidad de las Ciencias Informáticas",
+  "Otra",
+];
+
+export default function RegistroPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      country: formData.get("country") as string,
+      city: (formData.get("city") as string) || null,
+      university: formData.get("university") as string,
+      career: formData.get("career") as string,
+      graduationYear: parseInt(formData.get("graduationYear") as string),
+      currentProfession: formData.get("currentProfession") as string,
+      currentCompany:
+        (formData.get("currentCompany") as string) || null,
+      bio: (formData.get("bio") as string) || null,
+      phone: (formData.get("phone") as string) || null,
+      linkedin: (formData.get("linkedin") as string) || null,
+      website: (formData.get("website") as string) || null,
+      skills: (formData.get("skills") as string) || null,
+      languages: (formData.get("languages") as string) || null,
+      interests: (formData.get("interests") as string) || null,
+      photoUrl: (formData.get("photoUrl") as string) || null,
+    };
+
+    try {
+      const res = await fetch("/api/graduates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error || "Error al registrarse");
+      }
+
+      const graduate = await res.json();
+      router.push(`/egresados/${graduate.id}`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="min-h-screen">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-white">
+            Registro de Egresado
+          </h1>
+          <p className="text-neutral-400 mt-2">
+            Únete a la red internacional de profesionales formados en Cuba
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-800 rounded-xl text-red-300 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <Section title="Información Personal">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField
+                label="Nombre Completo"
+                name="name"
+                required
+                placeholder="Juan Pérez García"
+              />
+              <InputField
+                label="Correo Electrónico"
+                name="email"
+                type="email"
+                required
+                placeholder="juan@ejemplo.com"
+              />
+              <SelectField
+                label="País de Residencia"
+                name="country"
+                required
+                options={COUNTRIES}
+              />
+              <InputField
+                label="Ciudad"
+                name="city"
+                placeholder="Madrid"
+              />
+              <InputField
+                label="Teléfono"
+                name="phone"
+                placeholder="+34 600 000 000"
+              />
+              <InputField
+                label="URL de Foto de Perfil"
+                name="photoUrl"
+                placeholder="https://ejemplo.com/foto.jpg"
+              />
+            </div>
+          </Section>
+
+          <Section title="Formación en Cuba">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SelectField
+                label="Universidad"
+                name="university"
+                required
+                options={UNIVERSITIES}
+              />
+              <InputField
+                label="Carrera Estudiada"
+                name="career"
+                required
+                placeholder="Ingeniería Informática"
+              />
+              <InputField
+                label="Año de Graduación"
+                name="graduationYear"
+                type="number"
+                required
+                min={1960}
+                max={2030}
+                placeholder="2020"
+              />
+            </div>
+          </Section>
+
+          <Section title="Situación Profesional Actual">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField
+                label="Profesión Actual"
+                name="currentProfession"
+                required
+                placeholder="Desarrollador de Software"
+              />
+              <InputField
+                label="Empresa / Organización"
+                name="currentCompany"
+                placeholder="Tech Company S.A."
+              />
+            </div>
+          </Section>
+
+          <Section title="Perfil y Enlaces">
+            <div className="space-y-4">
+              <TextAreaField
+                label="Biografía"
+                name="bio"
+                placeholder="Cuéntanos sobre tu trayectoria profesional y tus logros..."
+                rows={4}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputField
+                  label="LinkedIn"
+                  name="linkedin"
+                  placeholder="https://linkedin.com/in/tuperfil"
+                />
+                <InputField
+                  label="Sitio Web / Portafolio"
+                  name="website"
+                  placeholder="https://tusitio.com"
+                />
+              </div>
+              <InputField
+                label="Habilidades"
+                name="skills"
+                placeholder="JavaScript, Gestión de Proyectos, Investigación (separadas por coma)"
+              />
+              <InputField
+                label="Idiomas"
+                name="languages"
+                placeholder="Español, Inglés, Francés (separados por coma)"
+              />
+              <InputField
+                label="Intereses"
+                name="interests"
+                placeholder="Tecnología, Salud, Educación, Cultura (separados por coma)"
+              />
+            </div>
+          </Section>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 disabled:text-neutral-500 text-white rounded-xl font-semibold transition-colors"
+          >
+            {loading ? "Registrando..." : "Completar Registro"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6">
+      <h2 className="text-lg font-semibold text-white mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function InputField({
+  label,
+  name,
+  type = "text",
+  required,
+  placeholder,
+  min,
+  max,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+        {label}
+        {required && <span className="text-red-400 ml-1">*</span>}
+      </label>
+      <input
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+      />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  required,
+  options,
+}: {
+  label: string;
+  name: string;
+  required?: boolean;
+  options: string[];
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+        {label}
+        {required && <span className="text-red-400 ml-1">*</span>}
+      </label>
+      <select
+        name={name}
+        required={required}
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+      >
+        <option value="">Seleccionar...</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function TextAreaField({
+  label,
+  name,
+  placeholder,
+  rows = 3,
+}: {
+  label: string;
+  name: string;
+  placeholder?: string;
+  rows?: number;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+        {label}
+      </label>
+      <textarea
+        name={name}
+        placeholder={placeholder}
+        rows={rows}
+        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm resize-none"
+      />
+    </div>
+  );
+}

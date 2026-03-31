@@ -1,10 +1,10 @@
-# Active Context: Next.js Starter Template
+# Active Context: Egresados Cuba - Red Internacional
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Status**: Aplicación completa implementada
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+Red social para egresados internacionales de la educación superior cubana. Permite gestionar perfiles, conectar egresados por criterios de afinidad, y crear listas de distribución de correo.
 
 ## Recently Completed
 
@@ -14,74 +14,64 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
+- [x] Database setup with Drizzle ORM + SQLite
+- [x] Schema: graduates, connections, posts, email_lists
+- [x] API routes for CRUD operations
+- [x] Navbar component with responsive mobile menu
+- [x] GraduateCard component for listing
+- [x] Home page with stats, recent graduates, activity feed
+- [x] Registration form with all fields
+- [x] Graduate profile page with full details
+- [x] Directory page with search and multi-criteria filtering
+- [x] Connections page with send/accept/reject workflow
+- [x] Email distribution lists with preview and copy
+- [x] 404 and error pages
 
 ## Current Structure
 
-| File/Directory | Purpose | Status |
-|----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+| File/Directory | Purpose |
+|----------------|---------|
+| `src/db/schema.ts` | Database schema (graduates, connections, posts, email_lists) |
+| `src/db/index.ts` | Database client |
+| `src/db/migrate.ts` | Migration script |
+| `src/app/page.tsx` | Home page with stats and feed |
+| `src/app/layout.tsx` | Root layout with Navbar |
+| `src/app/egresados/registro/page.tsx` | Registration form |
+| `src/app/egresados/[id]/page.tsx` | Graduate profile |
+| `src/app/directorio/page.tsx` | Directory with filters |
+| `src/app/conexiones/page.tsx` | Connections management |
+| `src/app/listas-correo/page.tsx` | Email distribution lists |
+| `src/app/api/graduates/route.ts` | Graduates API |
+| `src/app/api/graduates/[id]/route.ts` | Single graduate API |
+| `src/app/api/connections/route.ts` | Connections API |
+| `src/app/api/posts/route.ts` | Posts API |
+| `src/app/api/email-lists/route.ts` | Email lists API |
+| `src/app/api/stats/route.ts` | Statistics API |
+| `src/components/Navbar.tsx` | Navigation bar |
+| `src/components/GraduateCard.tsx` | Graduate card component |
 
-## Current Focus
+## Database Schema
 
-The template is ready. Next steps depend on user requirements:
+### graduates
+- id, name, email (unique), country, city, university, career, graduationYear
+- currentProfession, currentCompany, bio, photoUrl, phone, linkedin
+- skills, languages, interests, website, createdAt, updatedAt
 
-1. What type of application to build
-2. What features are needed
-3. Design/branding preferences
+### connections
+- id, senderId (FK graduates), receiverId (FK graduates)
+- status (pending/accepted/rejected), createdAt
 
-## Quick Start Guide
+### posts
+- id, graduateId (FK graduates), content, createdAt
 
-### To add a new page:
-
-Create a file at `src/app/[route]/page.tsx`:
-```tsx
-export default function NewPage() {
-  return <div>New page content</div>;
-}
-```
-
-### To add components:
-
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
-
-### To add a database:
-
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
+### email_lists
+- id, name, description
+- filterUniversity, filterCareer, filterCountry, filterYearFrom, filterYearTo
+- createdAt
 
 ## Session History
 
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
+| Current | Full Egresados Cuba social network implemented |
