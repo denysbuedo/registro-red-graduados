@@ -254,67 +254,82 @@ export default async function Home() {
   }
 
   // ============================================
-  // HOME PÚBLICO - Dividido al medio
+  // HOME PÚBLICO - Rediseñado
   // ============================================
   return (
-    <main className="fixed inset-0 z-50 flex overflow-hidden bg-white">
-      {/* Izquierda: Info de la red - Fondo azul */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#003f8f] flex-col p-12">
-        {/* Texto centrado verticalmente */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center text-white">
-          <h1 className="text-4xl font-bold leading-tight">
+    <main className="fixed inset-0 z-50 flex flex-col overflow-hidden">
+      {/* Contenido dividido */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Izquierda: Info de la red - Fondo azul */}
+        <div className="hidden lg:flex lg:w-1/2 bg-[#003f8f] flex-col justify-center px-16 xl:px-24 text-white">
+          <h1 className="text-4xl xl:text-5xl font-bold leading-tight">
             Red de Egresados Internacionales
-            <span className="block mt-2 text-2xl">
-              Educación Superior Cubana
+            <span className="block mt-2 text-2xl xl:text-3xl font-normal text-blue-200">
+              de la Educación Superior Cubana
             </span>
           </h1>
-          <p className="text-blue-100 text-lg max-w-md mt-6">
+          <p className="text-blue-100 text-lg max-w-md mt-8 leading-relaxed">
             Conecta con profesionales que estudiaron en universidades cubanas. Comparte investigación, colaboraciones académicas y crece junto a tu red.
           </p>
-        </div>
-        {/* Footer fijo abajo */}
-        <footer className="text-center text-sm text-blue-300 pt-8">
-          © 2026 Red de Egresados Internacionales · Ministerio de Educación Superior
-        </footer>
-      </div>
-
-      {/* Derecha: Login + Registro - Fondo blanco */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-8 overflow-y-auto relative">
-        {/* Mobile footer */}
-        <footer className="lg:hidden absolute bottom-4 text-center text-xs text-gray-400">
-          © 2026 Red de Egresados Internacionales · MES
-        </footer>
-
-        <div className="w-full max-w-sm">
-          {/* Login Form */}
-          <LoginForm />
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <span className="text-sm text-gray-400">o</span>
-            <div className="flex-1 h-px bg-gray-200"></div>
-          </div>
-
-          {/* Registro */}
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">¿No tienes cuenta?</h2>
-            <p className="text-sm text-gray-500 mb-4">Únete a la red de egresados internacionales</p>
-            <Link href="/register" className="block w-full py-3 bg-gray-100 text-gray-900 text-center rounded-lg font-semibold hover:bg-gray-200 transition-colors">
-              Regístrate
+          <div className="mt-10 flex gap-6 text-sm">
+            <Link href="/estatutos" className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
+              <span className="text-lg">📖</span>
+              <span className="underline">Estatutos</span>
             </Link>
-            <p className="text-xs text-gray-400 mt-3 text-center">
-              Tu cuenta será revisada por tu universidad antes de ser aprobada.
-            </p>
+            <Link href="/terminos" className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
+              <span className="text-lg">📄</span>
+              <span className="underline">Términos</span>
+            </Link>
           </div>
+        </div>
 
-          {/* Mobile links */}
-          <div className="lg:hidden flex justify-center gap-4 text-sm text-gray-500 pt-6 mt-4 border-t border-gray-200">
-            <Link href="/estatutos" className="text-[#003f8f] hover:underline">Estatutos</Link>
-            <Link href="/terminos" className="text-[#003f8f] hover:underline">Términos</Link>
+        {/* Derecha: Login + Registro - Fondo blanco */}
+        <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center px-8 sm:px-12 overflow-y-auto">
+          <div className="w-full max-w-sm">
+            {/* Mobile header */}
+            <div className="lg:hidden text-center mb-8">
+              <h1 className="text-2xl font-bold text-[#003f8f]">Red de Egresados</h1>
+              <p className="text-[#003f8f]/70 text-sm mt-1">Educación Superior Cubana</p>
+            </div>
+
+            {/* Login Form */}
+            <LoginForm />
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 my-8">
+              <div className="flex-1 h-px bg-gray-200"></div>
+              <span className="text-xs text-gray-400 uppercase tracking-wider">o</span>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            {/* Registro */}
+            <div className="text-center">
+              <p className="text-base text-gray-700 mb-4">¿No tienes cuenta?</p>
+              <Link href="/register" className="block w-full py-3 border-2 border-[#003f8f] text-[#003f8f] text-center rounded-lg font-semibold hover:bg-[#003f8f] hover:text-white transition-colors">
+                Regístrate
+              </Link>
+              <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+                Tu cuenta será revisada por tu universidad antes de ser aprobada.
+              </p>
+            </div>
+
+            {/* Mobile links */}
+            <div className="lg:hidden flex justify-center gap-6 text-sm text-gray-500 pt-6 mt-4 border-t border-gray-200">
+              <Link href="/estatutos" className="flex items-center gap-1 text-[#003f8f] hover:underline">
+                📖 Estatutos
+              </Link>
+              <Link href="/terminos" className="flex items-center gap-1 text-[#003f8f] hover:underline">
+                📄 Términos
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Footer full-width */}
+      <footer className="bg-[#002860] py-3 text-center text-sm text-blue-300 shrink-0">
+        © 2026 Red de Egresados Internacionales · Ministerio de Educación Superior
+      </footer>
     </main>
   );
 }

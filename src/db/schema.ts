@@ -1,3 +1,24 @@
+/**
+ * Schema de Base de Datos — Red de Egresados Internacionales
+ *
+ * Tablas principales:
+ * - users: Autenticación y gestión de cuentas
+ * - graduates: Perfiles profesionales de egresados
+ * - connections: Sistema de conexiones/amistades
+ * - user_posts: Publicaciones del feed de actividad
+ * - post_comments: Comentarios en publicaciones
+ * - post_reactions: Reacciones (👍❤️🎉💡) en posts
+ * - admin_posts: Noticias publicadas por admins/editors
+ * - events: Eventos (webinars, encuentros)
+ * - event_attendees: Asistentes confirmados a eventos
+ * - event_notification_log: Log de notificaciones automáticas de eventos
+ * - groups: Comunidades/grupos temáticos
+ * - group_members: Miembros de cada grupo
+ * - group_posts: Publicaciones dentro de grupos
+ * - notifications: Notificaciones del sistema
+ * - email_lists: Listas de correo (gestión administrativa)
+ */
+
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {

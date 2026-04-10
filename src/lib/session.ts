@@ -1,3 +1,18 @@
+/**
+ * Gestión de Sesiones — Red de Egresados Internacionales
+ *
+ * Funciones:
+ * - getSession(): Obtiene la sesión del usuario desde la cookie
+ * - setSession(): Crea una nueva sesión al hacer login
+ * - clearSession(): Elimina la cookie de sesión
+ *
+ * Detalles de la sesión:
+ * - Almacenamiento: Cookie HTTP-only
+ * - Duración: 24 horas (86,400 segundos)
+ * - Token: Base64 de { userId, createdAt }
+ * - Validación: Se verifica createdAt vs Date.now() en cada request
+ */
+
 import "server-only";
 import { cookies } from "next/headers";
 import { db } from "@/db";
@@ -5,7 +20,7 @@ import { users, graduates } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 const SESSION_COOKIE_NAME = "session";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const SESSION_MAX_AGE = 60 * 60 * 24; // 1 day (en segundos)
 
 export interface SessionUser {
   id: number;
@@ -13,6 +28,11 @@ export interface SessionUser {
   email: string;
   role: "user" | "admin" | "institution" | "editor";
   graduateId?: number | null;
+}
+
+interface SessionData {
+  userId: number;
+  createdAt: number; // timestamp en ms
 }
 
 export async function getSession(): Promise<SessionUser | null> {
@@ -25,7 +45,17 @@ export async function getSession(): Promise<SessionUser | null> {
 
   try {
     const decoded = atob(sessionToken);
-    const data = JSON.parse(decoded) as { userId: number };
+    const data = JSON.parse(decoded) as SessionData;
+
+    // Verificar si la sesión ha expirado
+    const sessionAge = Date.now() - data.createdAt;
+    const maxAgeMs = SESSION_MAX_AGE * 1000;
+
+    if (sessionAge > maxAgeMs) {
+      // Sesión expirada - limpiar cookie
+      await clearSession();
+      return null;
+    }
 
     const user = await db
       .select({
@@ -51,7 +81,7 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function setSession(user: SessionUser): Promise<void> {
   const cookieStore = await cookies();
-  const token = btoa(JSON.stringify({ userId: user.id }));
+  const token = btoa(JSON.stringify({ userId: user.id, createdAt: Date.now() }));
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
