@@ -1,6 +1,8 @@
 import { db } from "@/db";
 import { graduates } from "@/db/schema";
 import { sql } from "drizzle-orm";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 import { GraduateCard } from "@/components/GraduateCard";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +12,13 @@ export default async function DirectorioPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  // Verificar autenticación
+  const session = await getSession();
+  
+  if (!session) {
+    redirect("/login?redirect=/directorio");
+  }
+
   const params = await searchParams;
   const search = params.search || "";
   const country = params.country || "";
@@ -60,11 +69,11 @@ export default async function DirectorioPage({
     .orderBy(graduates.career);
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Directorio</h1>
-          <p className="text-neutral-400 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900">Directorio</h1>
+          <p className="text-gray-600 mt-1">
             Busca y filtra egresados por diferentes criterios
           </p>
         </div>
@@ -76,7 +85,7 @@ export default async function DirectorioPage({
               name="search"
               defaultValue={search}
               placeholder="Buscar por nombre, profesión o biografía..."
-              className="flex-1 px-4 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
+              className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition-all"
             />
             <button
               type="submit"
@@ -90,7 +99,7 @@ export default async function DirectorioPage({
             <select
               name="country"
               defaultValue={country}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
               <option value="">Todos los países</option>
               {countriesResult.map((c) => (
@@ -103,7 +112,7 @@ export default async function DirectorioPage({
             <select
               name="university"
               defaultValue={university}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
               <option value="">Todas las universidades</option>
               {universitiesResult.map((u) => (
@@ -116,7 +125,7 @@ export default async function DirectorioPage({
             <select
               name="career"
               defaultValue={career}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
               <option value="">Todas las carreras</option>
               {careersResult.map((c) => (
@@ -133,7 +142,7 @@ export default async function DirectorioPage({
               placeholder="Año desde"
               min={1960}
               max={2030}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             />
 
             <input
@@ -143,18 +152,18 @@ export default async function DirectorioPage({
               placeholder="Año hasta"
               min={1960}
               max={2030}
-              className="px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             />
           </div>
 
           {(search || country || university || career || yearFrom || yearTo) && (
             <div className="flex items-center gap-2">
-              <span className="text-neutral-400 text-sm">
+              <span className="text-gray-600 text-sm">
                 {allGraduates.length} resultado{allGraduates.length !== 1 && "s"}
               </span>
               <a
                 href="/directorio"
-                className="text-blue-400 hover:text-blue-300 text-sm"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
                 Limpiar filtros
               </a>
@@ -180,10 +189,34 @@ export default async function DirectorioPage({
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <p className="text-neutral-400 text-lg">
-              No se encontraron egresados con los filtros aplicados.
+          <div className="bg-white border border-gray-200 rounded-xl p-16 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No se encontraron resultados
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Intenta ajustar los filtros de búsqueda
             </p>
+            <a
+              href="/directorio"
+              className="inline-block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
+            >
+              Ver todos los egresados
+            </a>
           </div>
         )}
       </div>

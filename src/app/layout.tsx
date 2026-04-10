@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Egresados Cuba - Red Internacional",
+  title: "Red de Egresados Internacionales de la Educación Superior Cubana",
   description:
     "Red social para egresados internacionales de la educación superior cubana. Conecta con profesionales de todo el mundo.",
 };
@@ -27,8 +28,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
       >
+        <AutoRefresh />
         <Navbar />
         {children}
       </body>

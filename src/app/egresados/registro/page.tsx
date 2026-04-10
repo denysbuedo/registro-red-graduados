@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const COUNTRIES = [
   "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
@@ -33,10 +34,45 @@ const UNIVERSITIES = [
   "Otra",
 ];
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
 export default function RegistroPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/me");
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        
+        // Si ya tiene perfil de egresado, redirigir
+        if (data.graduate) {
+          router.push(`/egresados/${data.graduate.id}`);
+        }
+      } else {
+        // No autenticado, redirigir a login
+        router.push("/login?redirect=/egresados/registro");
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+      router.push("/login?redirect=/egresados/registro");
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,7 +82,7 @@ export default function RegistroPage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name") as string,
-      email: formData.get("email") as string,
+      email: user?.email || (formData.get("email") as string),
       country: formData.get("country") as string,
       city: (formData.get("city") as string) || null,
       university: formData.get("university") as string,
@@ -86,20 +122,36 @@ export default function RegistroPage() {
     }
   }
 
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando autenticación...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-gray-900">
             Registro de Egresado
           </h1>
-          <p className="text-neutral-400 mt-2">
-            Únete a la red internacional de profesionales formados en Cuba
+          <p className="text-gray-600 mt-2">
+            Completa tu perfil profesional
           </p>
+          {user && (
+            <p className="text-[#003f8f] mt-2 text-sm">
+              Registrando como: <span className="font-medium">{user.username}</span> ({user.email})
+            </p>
+          )}
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-800 rounded-xl text-red-300 text-sm">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
             {error}
           </div>
         )}
@@ -119,6 +171,8 @@ export default function RegistroPage() {
                 type="email"
                 required
                 placeholder="juan@ejemplo.com"
+                defaultValue={user?.email}
+                disabled
               />
               <SelectField
                 label="País de Residencia"
@@ -227,7 +281,7 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 disabled:text-neutral-500 text-white rounded-xl font-semibold transition-colors"
+            className="w-full py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
           >
             {loading ? "Registrando..." : "Completar Registro"}
           </button>
@@ -245,8 +299,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-4">{title}</h2>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
       {children}
     </div>
   );
@@ -260,6 +314,8 @@ function InputField({
   placeholder,
   min,
   max,
+  defaultValue,
+  disabled,
 }: {
   label: string;
   name: string;
@@ -268,12 +324,14 @@ function InputField({
   placeholder?: string;
   min?: number;
   max?: number;
+  defaultValue?: string;
+  disabled?: boolean;
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
         {label}
-        {required && <span className="text-red-400 ml-1">*</span>}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <input
         name={name}
@@ -282,7 +340,9 @@ function InputField({
         placeholder={placeholder}
         min={min}
         max={max}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
+        defaultValue={defaultValue}
+        disabled={disabled}
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
       />
     </div>
   );
@@ -301,14 +361,14 @@ function SelectField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
         {label}
-        {required && <span className="text-red-400 ml-1">*</span>}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <select
         name={name}
         required={required}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm"
       >
         <option value="">Seleccionar...</option>
         {options.map((opt) => (
@@ -334,14 +394,14 @@ function TextAreaField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
         {label}
       </label>
       <textarea
         name={name}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm resize-none"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm resize-none"
       />
     </div>
   );

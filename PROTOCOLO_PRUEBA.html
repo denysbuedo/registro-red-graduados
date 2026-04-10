@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo de Prueba — Red de Egresados Internacionales</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.5; color: #1f2937; background: #fff; font-size: 10pt; }
+        .page-break { page-break-after: always; }
+        
+        .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #003f8f 0%, #0050b8 50%, #002860 100%); padding: 2rem; }
+        .cover h1 { font-size: 2.4rem; margin-bottom: 1rem; font-weight: 700; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .cover h2 { font-size: 1.3rem; font-weight: 400; margin-bottom: 2rem; color: #e8edf3; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .cover .info { font-size: 0.95rem; color: #d4dbe6; }
+        
+        .content { max-width: 850px; margin: 0 auto; padding: 1.5rem 1.2rem; }
+        h1 { color: #003f8f; font-size: 1.6rem; margin: 1.5rem 0 0.8rem; padding-bottom: 0.4rem; border-bottom: 3px solid #003f8f; }
+        h2 { color: #003f8f; font-size: 1.25rem; margin: 1.2rem 0 0.6rem; }
+        p { margin: 0.5rem 0; }
+        
+        .test-header { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.8rem; margin: 1rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .test-header div { display: flex; gap: 0.3rem; }
+        .test-header label { font-weight: 600; color: #6b7280; font-size: 0.85rem; }
+        .test-header span { color: #1f2937; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem; }
+        th { background: #003f8f; color: white; padding: 0.5rem; text-align: left; font-weight: 600; font-size: 0.8rem; }
+        td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        tr:nth-child(even) { background: #f9fafb; }
+        .check-cell { width: 50px; text-align: center; }
+        
+        .obs { border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.4rem; margin: 0.5rem 0; min-height: 1.5rem; background: #fefefe; }
+        .obs-label { font-weight: 600; color: #6b7280; font-size: 0.8rem; }
+        
+        .summary-table { margin: 1rem 0; }
+        .summary-table th { background: #002860; }
+        
+        .footer { text-align: center; padding: 1.5rem 0; color: #6b7280; font-size: 0.8rem; border-top: 1px solid #e5e7eb; margin-top: 1.5rem; }
+        .note { background: #eff6ff; border-left: 3px solid #003f8f; padding: 0.6rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; font-size: 0.85rem; }
+        
+        @media print {
+            .cover { background: linear-gradient(135deg, #003f8f 0%, #0050b8 50%, #002860 100%) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover h1 { color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+            .cover h2 { color: #e8edf3 !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+            .cover .info { color: #d4dbe6 !important; }
+            th { background: #003f8f !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            tr:nth-child(even) { background: #f9fafb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .note { background: #eff6ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+    <h1>Protocolo de Prueba</h1>
+    <h2>Red de Egresados Internacionales<br>de la Educación Superior Cubana</h2>
+    <div class="info">
+        <p>44 casos de prueba — 14 secciones</p>
+        <p>Versión 1.0 — Abril 2026</p>
+    </div>
+</div>
+
+<!-- INFO GENERAL -->
+<div class="content page-break">
+    <h1>Información General</h1>
+    <div class="test-header">
+        <div><label>Fecha de prueba:</label> <span>____/____/________</span></div>
+        <div><label>Ejecutado por:</label> <span>________________________</span></div>
+        <div><label>Entorno:</label> <span>Desarrollo (localhost:3000)</span></div>
+        <div><label>Navegador:</label> <span>Chrome / Firefox / Edge</span></div>
+    </div>
+    <div class="note"><strong>Instrucciones:</strong> Sigue cada prueba en orden. Registra ✅ (Pasa) o ❌ (Falla). Documenta observaciones si hay fallos. No saltes pruebas.</div>
+    
+    <h1>1. Preparación del Entorno</h1>
+    <h2>TC-001: Iniciar servidor de desarrollo</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ejecutar <code>bun run dev</code></td><td>El servidor inicia sin errores</td><td></td></tr>
+        <tr><td>2</td><td>Abrir <code>http://localhost:3000</code></td><td>La página carga con código 200</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-002: Ejecutar migraciones</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ejecutar <code>node scripts/migrate.cjs</code></td><td>Muestra "✅ Migración ejecutada"</td><td></td></tr>
+        <tr><td>2</td><td>Verificar lista de tablas</td><td>Incluye todas las tablas del schema</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 2. AUTENTICACIÓN -->
+<div class="content page-break">
+    <h1>2. Autenticación</h1>
+    <h2>TC-010: Crear cuenta de usuario</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ir a <code>/register</code></td><td>Formulario con fondo blanco, campos grises</td><td></td></tr>
+        <tr><td>2</td><td>Llenar username, email, contraseña</td><td>Campos aceptan texto</td><td></td></tr>
+        <tr><td>3</td><td>Click "Crear Cuenta"</td><td>Cuenta creada, redirige a <code>/egresados/registro</code></td><td></td></tr>
+        <tr><td>4</td><td>Email duplicado</td><td>Muestra error "email ya registrado"</td><td></td></tr>
+        <tr><td>5</td><td>Contraseñas diferentes</td><td>Muestra error "Las contraseñas no coinciden"</td><td></td></tr>
+        <tr><td>6</td><td>Contraseña &lt; 6 caracteres</td><td>Muestra error correspondiente</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-011: Iniciar sesión</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ir a <code>/login</code></td><td>Formulario con fondo blanco</td><td></td></tr>
+        <tr><td>2</td><td>Credenciales válidas</td><td>Login exitoso, redirige a <code>/</code></td><td></td></tr>
+        <tr><td>3</td><td>Verificar Navbar</td><td>Muestra avatar + username + logout</td><td></td></tr>
+        <tr><td>4</td><td>Recargar página</td><td>Mantiene sesión activa</td><td></td></tr>
+        <tr><td>5</td><td>Credenciales inválidas</td><td>Muestra "Credenciales inválidas"</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-012: Cerrar sesión</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Abrir menú de usuario</td><td>Dropdown con opciones</td><td></td></tr>
+        <tr><td>2</td><td>Click "Cerrar Sesión"</td><td>Sesión cerrada, Navbar muestra Login/Registro</td><td></td></tr>
+        <tr><td>3</td><td>Ir a <code>/directorio</code></td><td>Redirige a <code>/login</code></td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-013: Login de administrador</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Login: <code>dinfo</code> / <code>Alexa.55260611</code></td><td>Login exitoso</td><td></td></tr>
+        <tr><td>2</td><td>Abrir menú de usuario</td><td>Muestra "🛡️ Panel Admin"</td><td></td></tr>
+        <tr><td>3</td><td>Click Panel Admin</td><td>Accede a <code>/admin</code></td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 3. PERFIL Y DIRECTORIO -->
+<div class="content page-break">
+    <h1>3. Perfil de Egresado</h1>
+    <h2>TC-020: Completar perfil</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Estar en <code>/egresados/registro</code></td><td>Formulario con fondo blanco</td><td></td></tr>
+        <tr><td>2</td><td>Llenar todos los campos</td><td>Campos aceptan texto</td><td></td></tr>
+        <tr><td>3</td><td>Click "Completar Registro"</td><td>Redirige a <code>/egresados/[id]</code></td><td></td></tr>
+        <tr><td>4</td><td>Verificar perfil</td><td>Muestra todos los datos</td><td></td></tr>
+        <tr><td>5</td><td>Segundo registro</td><td>"Ya tienes un perfil registrado"</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-021 a TC-023: Visibilidad de perfiles</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>"Mi Perfil" en Navbar</td><td>Navega a <code>/egresados/[mi-id]</code></td><td></td></tr>
+        <tr><td>2</td><td>Perfil de amigo</td><td>Perfil completo visible</td><td></td></tr>
+        <tr><td>3</td><td>Perfil de no-amigo</td><td>"Perfil Privado" + botón conectar</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h1>4. Directorio</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Sin login → <code>/directorio</code></td><td>Redirige a <code>/login</code></td><td></td></tr>
+        <tr><td>2</td><td>Con login → <code>/directorio</code></td><td>Lista de egresados</td><td></td></tr>
+        <tr><td>3</td><td>Buscar por nombre</td><td>Filtra correctamente</td><td></td></tr>
+        <tr><td>4</td><td>Combinar filtros</td><td>Aplica todos los filtros</td><td></td></tr>
+        <tr><td>5</td><td>"Limpiar filtros"</td><td>Resetea todos</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 5. CONEXIONES -->
+<div class="content page-break">
+    <h1>5. Sistema de Conexiones</h1>
+    <h2>TC-040: Enviar solicitud</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Click "Conectar"</td><td>Envía solicitud</td><td></td></tr>
+        <tr><td>2</td><td>Ver botón</td><td>Cambia a "Solicitud enviada" (amarillo)</td><td></td></tr>
+        <tr><td>3</td><td>Segunda solicitud</td><td>Error "Ya has enviado solicitud"</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>TC-041 a TC-043: Responder y gestionar</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ver badge en "Conexiones"</td><td>Badge con número</td><td></td></tr>
+        <tr><td>2</td><td>Tab "Solicitudes Recibidas"</td><td>Lista visible</td><td></td></tr>
+        <tr><td>3</td><td>Click "Aceptar"</td><td>Conexión aceptada</td><td></td></tr>
+        <tr><td>4</td><td>Tab "Amigos"</td><td>Amigo aparece (NO aparece uno mismo)</td><td></td></tr>
+        <tr><td>5</td><td>Click "Rechazar"</td><td>Eliminada de la lista</td><td></td></tr>
+        <tr><td>6</td><td>Tab "Enviadas" → Cancelar</td><td>Solicitud eliminada</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 6. FEED -->
+<div class="content page-break">
+    <h1>6. Feed de Actividad</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ver "Crear Publicación"</td><td>Formulario + barra de progreso</td><td></td></tr>
+        <tr><td>2</td><td>Escribir y publicar</td><td>Post aparece en el feed</td><td></td></tr>
+        <tr><td>3</td><td>Publicar 3 veces</td><td>Todas se crean</td><td></td></tr>
+        <tr><td>4</td><td>4ta publicación</td><td>Error "límite de 3 publicaciones"</td><td></td></tr>
+        <tr><td>5</td><td>Post con imagen</td><td>Imagen visible, object-contain</td><td></td></tr>
+        <tr><td>6</td><td>Post largo (&gt;500 chars)</td><td>"Leer más" expande/colapsa</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h2>Comentarios</h2>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Click "Comentarios"</td><td>Se expande sección</td><td></td></tr>
+        <tr><td>2</td><td>Escribir y comentar</td><td>Comentario aparece</td><td></td></tr>
+        <tr><td>3</td><td>Autor recibe notificación</td><td>Badge incrementa</td><td></td></tr>
+        <tr><td>4</td><td>11 comentarios en un día</td><td>Error al exceder límite</td><td></td></tr>
+        <tr><td>5</td><td>Eliminar comentario propio</td><td>Desaparece, contador baja</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 7. EVENTOS -->
+<div class="content page-break">
+    <h1>7. Eventos</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ir a <code>/eventos</code></td><td>Lista de eventos próximos</td><td></td></tr>
+        <tr><td>2</td><td>Click en título</td><td>Navega a <code>/eventos/[id]</code></td><td></td></tr>
+        <tr><td>3</td><td>Ver detalle</td><td>Info completa + asistentes</td><td></td></tr>
+        <tr><td>4</td><td>Click "✓ Asistiré"</td><td>Contador incrementa</td><td></td></tr>
+        <tr><td>5</td><td>Admin → <code>/admin/events/new</code></td><td>Formulario visible</td><td></td></tr>
+        <tr><td>6</td><td>Crear evento</td><td>Aparece en lista</td><td></td></tr>
+        <tr><td>7</td><td><code>/admin/events/[id]</code></td><td>Resumen con asistentes</td><td></td></tr>
+        <tr><td>8</td><td>Filtrar asistentes</td><td>Lista se actualiza</td><td></td></tr>
+        <tr><td>9</td><td>"Notificar asistentes"</td><td>Notificaciones enviadas</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 8. GRUPOS -->
+<div class="content page-break">
+    <h1>8. Grupos / Comunidades</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ir a <code>/comunidades</code></td><td>Lista de grupos</td><td></td></tr>
+        <tr><td>2</td><td>Filtrar por tipo</td><td>Lista se actualiza</td><td></td></tr>
+        <tr><td>3</td><td>"+ Crear Grupo"</td><td>Formulario visible</td><td></td></tr>
+        <tr><td>4</td><td>Crear y guardar</td><td>Grupo aparece en lista</td><td></td></tr>
+        <tr><td>5</td><td>Click "Unirse"</td><td>Miembro añadido</td><td></td></tr>
+        <tr><td>6</td><td>Click en grupo → detalle</td><td>Info + miembros + posts</td><td></td></tr>
+        <tr><td>7</td><td>Publicar en grupo</td><td>Post aparece</td><td></td></tr>
+        <tr><td>8</td><td>Editar grupo (creador)</td><td>Nombre actualizado</td><td></td></tr>
+        <tr><td>9</td><td>"Salir del grupo"</td><td>Confirma, luego sale</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 9. NOTIFICACIONES -->
+<div class="content page-break">
+    <h1>9. Notificaciones</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Comentar post de otro</td><td>Dueño recibe notificación</td><td></td></tr>
+        <tr><td>2</td><td>Aceptar conexión</td><td>Emisor recibe notificación</td><td></td></tr>
+        <tr><td>3</td><td>Ver badge campana</td><td>Contador rojo visible</td><td></td></tr>
+        <tr><td>4</td><td>Click en campana</td><td>Dropdown con lista</td><td></td></tr>
+        <tr><td>5</td><td>No leídas</td><td>Fondo azul, negrita, punto azul</td><td></td></tr>
+        <tr><td>6</td><td>Leídas</td><td>Fondo blanco, texto normal</td><td></td></tr>
+        <tr><td>7</td><td>Click en notificación</td><td>Marca leída + navega</td><td></td></tr>
+        <tr><td>8</td><td>Click ✓ individual</td><td>Solo esa se marca</td><td></td></tr>
+        <tr><td>9</td><td>"Marcar todas leídas"</td><td>Todas cambian pero permanecen</td><td></td></tr>
+        <tr><td>10</td><td>Recargar página</td><td>Notificaciones persisten</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 10. PANEL ADMIN -->
+<div class="content page-break">
+    <h1>10. Panel de Administración</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ir a <code>/admin</code></td><td>Dashboard con estadísticas</td><td></td></tr>
+        <tr><td>2</td><td>Ver contadores</td><td>Números correctos</td><td></td></tr>
+        <tr><td>3</td><td><code>/admin/users</code></td><td>Lista de usuarios</td><td></td></tr>
+        <tr><td>4</td><td>Buscar usuario</td><td>Filtra correctamente</td><td></td></tr>
+        <tr><td>5</td><td>Click en rol para editar</td><td>Cambia Usuario ↔ Admin</td><td></td></tr>
+        <tr><td>6</td><td>Eliminar usuario ajeno</td><td>Confirmación → eliminado</td><td></td></tr>
+        <tr><td>7</td><td>Eliminarse a sí mismo</td><td>Error correspondiente</td><td></td></tr>
+        <tr><td>8</td><td><code>/admin/posts/new</code></td><td>Crear noticia con imagen</td><td></td></tr>
+        <tr><td>9</td><td>Ver en home</td><td>Noticia aparece</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+</div>
+
+<!-- 11. DISEÑO Y ACCESO -->
+<div class="content">
+    <h1>11. Diseño y Auto-Refresh</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Ver Navbar</td><td>Fondo blanco, texto azul #003f8f</td><td></td></tr>
+        <tr><td>2</td><td>Login/Registro</td><td>Fondo blanco, no negro</td><td></td></tr>
+        <tr><td>3</td><td>Home público</td><td>Gradiente azul MES</td><td></td></tr>
+        <tr><td>4</td><td>Esperar 30 segundos</td><td>Notificaciones se actualizan</td><td></td></tr>
+        <tr><td>5</td><td>Esperar 60 segundos</td><td>Página completa se refresca</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h1>12. Acceso Restringido</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Sin login → directorio</td><td>Redirige a /login</td><td></td></tr>
+        <tr><td>2</td><td>Sin login → eventos</td><td>Redirige a /login</td><td></td></tr>
+        <tr><td>3</td><td>Sin login → comunidades</td><td>Redirige a /login</td><td></td></tr>
+        <tr><td>4</td><td>Usuario → /admin</td><td>Redirige a /</td><td></td></tr>
+        <tr><td>5</td><td>Usuario → crear evento</td><td>Error 403</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h1>13. Escenario Completo (E2E)</h1>
+    <table><thead><tr><th>Paso</th><th>Acción</th><th>Resultado esperado</th><th class="check-cell">✅/❌</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>Crear cuenta</td><td>Cuenta creada</td><td></td></tr>
+        <tr><td>2</td><td>Completar perfil</td><td>Perfil creado</td><td></td></tr>
+        <tr><td>3</td><td>Ver home logueado</td><td>Feed + sidebar con stats</td><td></td></tr>
+        <tr><td>4</td><td>Buscar egresados</td><td>Lista visible</td><td></td></tr>
+        <tr><td>5</td><td>Enviar 2 conexiones</td><td>2 solicitudes enviadas</td><td></td></tr>
+        <tr><td>6</td><td>Crear publicación</td><td>Post aparece</td><td></td></tr>
+        <tr><td>7</td><td>Unirse a grupo</td><td>Miembro del grupo</td><td></td></tr>
+        <tr><td>8</td><td>Publicar en grupo</td><td>Post del grupo visible</td><td></td></tr>
+        <tr><td>9</td><td>Ver notificaciones</td><td>Badge si hay actividad</td><td></td></tr>
+        <tr><td>10</td><td>Confirmar asistencia evento</td><td>RSVP registrado</td><td></td></tr>
+    </tbody></table>
+    <div class="obs"><span class="obs-label">Observaciones:</span> _______________________________________________</div>
+
+    <h1>Resumen de Resultados</h1>
+    <table class="summary-table">
+        <thead><tr><th>Sección</th><th>Total Pruebas</th><th>✅ Pasan</th><th>❌ Fallan</th></tr></thead>
+        <tbody>
+            <tr><td>Preparación</td><td>2</td><td></td><td></td></tr>
+            <tr><td>Autenticación</td><td>4</td><td></td><td></td></tr>
+            <tr><td>Perfil</td><td>3</td><td></td><td></td></tr>
+            <tr><td>Directorio</td><td>3</td><td></td><td></td></tr>
+            <tr><td>Conexiones</td><td>3</td><td></td><td></td></tr>
+            <tr><td>Feed</td><td>6</td><td></td><td></td></tr>
+            <tr><td>Eventos</td><td>5</td><td></td><td></td></tr>
+            <tr><td>Grupos</td><td>5</td><td></td><td></td></tr>
+            <tr><td>Notificaciones</td><td>5</td><td></td><td></td></tr>
+            <tr><td>Panel Admin</td><td>4</td><td></td><td></td></tr>
+            <tr><td>Diseño y Refresh</td><td>3</td><td></td><td></td></tr>
+            <tr><td>Acceso Restringido</td><td>3</td><td></td><td></td></tr>
+            <tr><td>E2E</td><td>4</td><td></td><td></td></tr>
+            <tr><td><strong>TOTAL</strong></td><td><strong>50</strong></td><td></td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h1>Resultado Final</h1>
+    <div class="test-header" style="grid-template-columns: 1fr;">
+        <div style="margin:0.5rem 0;"><label>¿Aprobado para producción?</label> 
+        <span style="margin-left:2rem;">☐ SÍ — Todas las pruebas pasan &nbsp;&nbsp;&nbsp; ☐ NO — Hay fallas &nbsp;&nbsp;&nbsp; ☐ CON OBSERVACIONES</span></div>
+    </div>
+    <div style="margin:1.5rem 0; display:flex; gap:3rem;">
+        <div><label style="font-weight:600;">Firma:</label> ________________________</div>
+        <div><label style="font-weight:600;">Fecha:</label> ____/____/________</div>
+    </div>
+
+    <div class="footer">
+        <p>Red de Egresados Internacionales de la Educación Superior Cubana</p>
+        <p>Protocolo de Prueba — Versión 1.0 — Abril 2026</p>
+    </div>
+</div>
+
+</body>
+</html>

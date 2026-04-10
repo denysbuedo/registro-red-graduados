@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { graduates } from "@/db/schema";
+import { graduates, users } from "@/db/schema";
 import { like, eq, and, gte, lte, sql } from "drizzle-orm";
+import { getSession } from "@/lib/session";
 
 export async function GET(request: Request) {
   try {
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
 
     if (search) {
       conditions.push(
-        sql`(${graduates.name} LIKE ${"%" + search + "%"} OR ${graduates.currentProfession} LIKE ${"%" + search + "%"} OR ${graduates.bio} LIKE ${"%" + search + "%"})`
+        sql`${graduates.name} LIKE ${"%" + search + "%"}`
       );
     }
     if (country) {
@@ -56,15 +57,40 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticación
+    const session = await getSession();
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: "Debes iniciar sesión para registrarte como egresado" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
+
+    // Verificar si el usuario ya tiene un perfil de egresado
+    const existingGraduate = await db
+      .select()
+      .from(graduates)
+      .where(eq(graduates.userId, session.id))
+      .limit(1);
+
+    if (existingGraduate.length > 0) {
+      return NextResponse.json(
+        { error: "Ya tienes un perfil de egresado registrado" },
+        { status: 400 }
+      );
+    }
 
     const newGraduate = await db
       .insert(graduates)
       .values({
+        userId: session.id,
         name: body.name,
-        email: body.email,
+        email: body.email || session.email,
         country: body.country,
         city: body.city || null,
         university: body.university,
@@ -82,6 +108,12 @@ export async function POST(request: Request) {
         website: body.website || null,
       })
       .returning();
+
+    // Actualizar el usuario con el graduateId
+    await db
+      .update(users)
+      .set({ graduateId: newGraduate[0].id })
+      .where(eq(users.id, session.id));
 
     return NextResponse.json(newGraduate[0], { status: 201 });
   } catch (error) {

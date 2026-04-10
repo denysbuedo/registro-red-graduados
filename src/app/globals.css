@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+:root {
+  /* Color oficial del MES */
+  --mes-blue: #003f8f;
+  --mes-blue-light: #0050b8;
+  --mes-blue-dark: #002860;
+}
