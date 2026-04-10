@@ -145,6 +145,7 @@ export function Navbar() {
             <NavLink href="/">Inicio</NavLink>
             {user && <NavLink href="/directorio">Directorio</NavLink>}
             {user && <NavLink href="/eventos">Eventos</NavLink>}
+            {user && <NavLink href="/noticias">Noticias</NavLink>}
             {user && <NavLink href="/comunidades">Comunidades</NavLink>}
             {user && (
               <NavLink href="/conexiones">
@@ -357,6 +358,7 @@ export function Navbar() {
               </MobileNavLink>
               {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>}
               {user && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
+              {user && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
               {user && <MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink>}
 
               {user ? (

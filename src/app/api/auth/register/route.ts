@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Hashear contraseña
     const passwordHash = await hashPassword(password);
 
-    // Crear usuario
+    // Crear usuario en estado pendiente
     const result = await db
       .insert(users)
       .values({
@@ -50,27 +50,22 @@ export async function POST(request: NextRequest) {
         email,
         passwordHash,
         role: "user",
+        status: "pending",
       })
       .returning();
 
     const newUser = result[0];
 
-    // Crear sesión
-    await setSession({
-      id: newUser.id,
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role as "user" | "admin",
-      graduateId: newUser.graduateId,
-    });
-
+    // NO crear sesión - usuario debe esperar aprobación
     return NextResponse.json(
       {
-        message: "Usuario creado exitosamente",
+        message: "Registro exitoso. Tu cuenta está pendiente de aprobación.",
+        pending: true,
         user: {
           id: newUser.id,
           username: newUser.username,
           email: newUser.email,
+          status: newUser.status,
         },
       },
       { status: 201 }

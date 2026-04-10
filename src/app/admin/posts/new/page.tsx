@@ -10,6 +10,7 @@ export default function NewPostPage() {
     title: "",
     content: "",
     imageUrl: "",
+    pinDays: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -201,6 +202,26 @@ export default function NewPostPage() {
               />
               <p className="mt-1 text-xs text-gray-500">
                 Mínimo 20 caracteres. El texto se mostrará parcialmente con opción "Leer más".
+              </p>
+            </div>
+
+            {/* Fijar noticia */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                📌 Fijar noticia arriba (opcional)
+              </label>
+              <select
+                value={formData.pinDays}
+                onChange={(e) => setFormData({ ...formData, pinDays: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">No fijar</option>
+                <option value="1">1 día</option>
+                <option value="3">3 días</option>
+                <option value="7">7 días</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Las noticias fijadas aparecerán arriba en la página de inicio
               </p>
             </div>
           </div>

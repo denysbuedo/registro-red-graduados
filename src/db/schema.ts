@@ -6,7 +6,9 @@ export const users = sqliteTable("users", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   graduateId: integer("graduate_id"),
-  role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
+  role: text("role", { enum: ["user", "admin", "institution", "editor"] }).notNull().default("user"),
+  status: text("status", { enum: ["pending", "approved", "rejected"] }).notNull().default("pending"),
+  rejectionReason: text("rejection_reason"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
@@ -91,6 +93,7 @@ export const adminPosts = sqliteTable("admin_posts", {
   imageUrl: text("image_url"),
   authorName: text("author_name").notNull(),
   authorId: integer("author_id").references(() => users.id),
+  pinnedUntil: integer("pinned_until"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

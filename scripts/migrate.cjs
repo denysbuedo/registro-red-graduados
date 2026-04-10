@@ -1,22 +1,31 @@
 const Database = require("better-sqlite3");
-const { readFileSync } = require("fs");
 const { join } = require("path");
+const { readFileSync } = require("fs");
 
 const sqlite = new Database(join(__dirname, "..", "dev.db"));
 
-const migrationContent = readFileSync(
-  join(__dirname, "..", "src", "db", "migrations", "0011_add_event_notification_log.sql"),
-  "utf-8"
-);
+const migrations = [
+  "0013_add_pinned_posts.sql",
+];
 
-console.log("Ejecutando migración 0011_add_event_notification_log.sql...");
-sqlite.exec(migrationContent);
+for (const migration of migrations) {
+  try {
+    const content = readFileSync(
+      join(__dirname, "..", "src", "db", "migrations", migration),
+      "utf-8"
+    );
+    console.log(`Ejecutando ${migration}...`);
+    sqlite.exec(content);
+    console.log("✅ OK");
+  } catch (error) {
+    if (error.message.includes("duplicate")) {
+      console.log("⚠️  Ya existe (saltando)");
+    } else {
+      throw error;
+    }
+  }
+}
 
-console.log("✅ Migración ejecutada correctamente!");
-
-const tables = sqlite
-  .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-  .all();
-console.log("Tablas:", tables.map(t => t.name).join(", "));
-
+const cols = sqlite.prepare("PRAGMA table_info(admin_posts)").all();
+console.log("Columnas admin_posts:", cols.map(c => c.name).join(", "));
 sqlite.close();

@@ -34,6 +34,24 @@ export async function POST(request: NextRequest) {
 
     const user = userResult[0];
 
+    // Verificar estado de aprobación
+    if (user.status === "pending") {
+      return NextResponse.json(
+        { error: "Tu cuenta está pendiente de aprobación. Recibirás un correo cuando sea aprobada." },
+        { status: 403 }
+      );
+    }
+
+    if (user.status === "rejected") {
+      return NextResponse.json(
+        { 
+          error: "Tu cuenta fue rechazada.",
+          reason: user.rejectionReason || "Sin motivo especificado",
+        },
+        { status: 403 }
+      );
+    }
+
     // Verificar contraseña
     const isValidPassword = await verifyPassword(password, user.passwordHash);
 

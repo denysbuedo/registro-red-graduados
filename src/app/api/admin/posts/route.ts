@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, imageUrl } = body;
+    const { title, content, imageUrl, pinDays } = body;
 
     // Validaciones
     if (!title || !content) {
@@ -74,6 +74,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Calcular pinnedUntil si se especificaron días
+    const pinDaysNum = parseInt(pinDays);
+    let pinnedUntil = null;
+    if (!isNaN(pinDaysNum) && [1, 3, 7].includes(pinDaysNum)) {
+      pinnedUntil = Math.floor(Date.now() / 1000) + (pinDaysNum * 24 * 60 * 60);
+    }
+
     // Crear el post
     const newPost = await db
       .insert(adminPosts)
@@ -83,6 +90,7 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl || null,
         authorName: session.username,
         authorId: session.id,
+        pinnedUntil,
       })
       .returning();
 

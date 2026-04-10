@@ -11,7 +11,7 @@ export interface SessionUser {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "institution" | "editor";
   graduateId?: number | null;
 }
 
