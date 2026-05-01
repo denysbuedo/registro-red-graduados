@@ -30,7 +30,23 @@ export default function CommunitiesPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchGroups();
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/comunidades");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchGroups();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/comunidades");
+      });
   }, [filter]);
 
   const fetchGroups = async () => {

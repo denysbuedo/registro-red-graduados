@@ -23,7 +23,23 @@ export default function EventsPage() {
   const [rsvpLoading, setRsvpLoading] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchEvents();
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/eventos");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchEvents();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/eventos");
+      });
   }, []);
 
   const fetchEvents = async () => {

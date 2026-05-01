@@ -5,7 +5,7 @@ const { readFileSync } = require("fs");
 const sqlite = new Database(join(__dirname, "..", "dev.db"));
 
 const migrations = [
-  "0013_add_pinned_posts.sql",
+  "0015_add_pending_university.sql",
 ];
 
 for (const migration of migrations) {
@@ -26,6 +26,6 @@ for (const migration of migrations) {
   }
 }
 
-const cols = sqlite.prepare("PRAGMA table_info(admin_posts)").all();
-console.log("Columnas admin_posts:", cols.map(c => c.name).join(", "));
+const cols = sqlite.prepare("PRAGMA table_info(users)").all();
+console.log("Columnas users:", cols.map(c => c.name).join(", "));
 sqlite.close();

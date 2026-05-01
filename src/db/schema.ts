@@ -30,6 +30,8 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["user", "admin", "institution", "editor"] }).notNull().default("user"),
   status: text("status", { enum: ["pending", "approved", "rejected"] }).notNull().default("pending"),
   rejectionReason: text("rejection_reason"),
+  institutionName: text("institution_name"), // Para rol "institution"
+  pendingUniversity: text("pending_university"), // Universidad seleccionada al registrarse
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
@@ -65,6 +67,25 @@ export const graduates = sqliteTable("graduates", {
     () => new Date()
   ),
 });
+
+// Lista de universidades cubanas
+export const UNIVERSITIES = [
+  "Universidad de La Habana",
+  "Universidad de Oriente",
+  "Universidad Central de Las Villas",
+  "Universidad Marta Abreu de Las Villas",
+  "Universidad de Camagüey",
+  "Universidad de Pinar del Río",
+  "Universidad de Holguín",
+  "Universidad de Granma",
+  "Universidad de Sancti Spíritus",
+  "Universidad de Matanzas",
+  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
+  "Universidad de Ciencias Médicas de La Habana",
+  "Escuela Internacional de Educación Física y Deportes",
+  "Instituto Superior de Arte",
+  "Universidad de las Ciencias Informáticas",
+];
 
 export const connections = sqliteTable("connections", {
   id: integer("id").primaryKey({ autoIncrement: true }),

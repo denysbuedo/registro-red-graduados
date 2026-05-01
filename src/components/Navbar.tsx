@@ -8,8 +8,10 @@ interface User {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "institution" | "editor";
+  status: string;
   graduateId: number | null;
+  institutionName: string | null;
 }
 
 interface Notification {
@@ -53,6 +55,10 @@ export function Navbar() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+        // Redirigir usuarios pendientes
+        if (data.user?.status === "pending") {
+          window.location.href = "/pendiente";
+        }
       }
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -144,6 +150,11 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <NavLink href="/">Inicio</NavLink>
             {user && <NavLink href="/directorio">Directorio</NavLink>}
+            {user && user.role === "institution" && (
+              <NavLink href="/universidad">
+                <span className="flex items-center gap-1">🏛️ Mi Universidad</span>
+              </NavLink>
+            )}
             {user && <NavLink href="/eventos">Eventos</NavLink>}
             {user && <NavLink href="/noticias">Noticias</NavLink>}
             {user && <NavLink href="/comunidades">Comunidades</NavLink>}
@@ -357,6 +368,10 @@ export function Navbar() {
                 Inicio
               </MobileNavLink>
               {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>}
+              {user && <MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>🤝 Conexiones</MobileNavLink>}
+              {user && user.role === "institution" && (
+                <MobileNavLink href="/universidad" onClick={() => setIsOpen(false)}>🏛️ Mi Universidad</MobileNavLink>
+              )}
               {user && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
               {user && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
               {user && <MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink>}

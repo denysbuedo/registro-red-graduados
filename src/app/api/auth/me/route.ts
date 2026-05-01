@@ -18,6 +18,8 @@ export async function GET() {
       username: user.username,
       email: user.email,
       role: user.role,
+      status: user.status,
+      pendingUniversity: user.pendingUniversity,
       graduateId: user.graduateId,
     },
     graduate,

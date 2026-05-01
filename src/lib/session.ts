@@ -27,6 +27,9 @@ export interface SessionUser {
   username: string;
   email: string;
   role: "user" | "admin" | "institution" | "editor";
+  status: string;
+  pendingUniversity?: string | null;
+  institutionName?: string | null;
   graduateId?: number | null;
 }
 
@@ -63,6 +66,9 @@ export async function getSession(): Promise<SessionUser | null> {
         username: users.username,
         email: users.email,
         role: users.role,
+        status: users.status,
+        pendingUniversity: users.pendingUniversity,
+        institutionName: users.institutionName,
         graduateId: users.graduateId,
       })
       .from(users)

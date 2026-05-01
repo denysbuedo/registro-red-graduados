@@ -38,6 +38,7 @@ interface User {
   id: number;
   username: string;
   email: string;
+  status?: string;
 }
 
 export default function RegistroPage() {
@@ -57,7 +58,7 @@ export default function RegistroPage() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        
+
         // Si ya tiene perfil de egresado, redirigir
         if (data.graduate) {
           router.push(`/egresados/${data.graduate.id}`);
@@ -73,6 +74,8 @@ export default function RegistroPage() {
       setCheckingAuth(false);
     }
   };
+
+  const isPending = user?.status === "pending";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -113,8 +116,8 @@ export default function RegistroPage() {
         throw new Error(body.error || "Error al registrarse");
       }
 
-      const graduate = await res.json();
-      router.push(`/egresados/${graduate.id}`);
+      // Redirigir a página de pendiente después de completar perfil
+      window.location.href = "/pendiente";
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
@@ -153,6 +156,13 @@ export default function RegistroPage() {
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
             {error}
+          </div>
+        )}
+
+        {isPending && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <p className="text-yellow-800 font-medium text-sm">⏳ Tu cuenta está pendiente de aprobación</p>
+            <p className="text-yellow-600 text-xs mt-1">Completa tu perfil para que la universidad pueda revisarlo.</p>
           </div>
         )}
 

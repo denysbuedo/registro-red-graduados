@@ -1,210 +1,233 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function RegisterPage() {
+const UNIVERSITIES = [
+  "Universidad de La Habana",
+  "Universidad de Oriente",
+  "Universidad Central de Las Villas",
+  "Universidad de Camagüey",
+  "Universidad de Pinar del Río",
+  "Universidad de Holguín",
+  "Universidad de Granma",
+  "Universidad de Matanzas",
+  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
+  "Universidad de Ciencias Médicas de La Habana",
+  "Escuela Internacional de Educación Física y Deportes",
+  "Instituto Superior de Arte",
+  "Universidad de las Ciencias Informáticas",
+  "Otra",
+];
+
+const COUNTRIES = [
+  "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
+  "Costa Rica", "Cuba", "Ecuador", "El Salvador", "España", "Estados Unidos",
+  "Francia", "Guatemala", "Honduras", "Italia", "Jamaica", "México",
+  "Nicaragua", "Panamá", "Paraguay", "Perú", "República Dominicana",
+  "Uruguay", "Venezuela", "Alemania", "Reino Unido", "Angola", "Mozambique",
+  "Sudáfrica", "Nigeria", "China", "Japón", "India", "Australia", "Otro",
+];
+
+export default function RegistroPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
     setError("");
 
-    // Validaciones
-    if (formData.password !== formData.confirmPassword) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
+    const formData = new FormData(e.currentTarget);
 
-    if (formData.password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-
-    setLoading(true);
+    // Combine auth + graduate data in one request
+    const data = {
+      username: formData.get("username"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      university: formData.get("university"),
+      name: formData.get("name"),
+      country: formData.get("country"),
+      career: formData.get("career"),
+      graduationYear: parseInt(formData.get("graduationYear") as string),
+      currentProfession: formData.get("currentProfession"),
+      city: formData.get("city") || null,
+      currentCompany: formData.get("currentCompany") || null,
+      bio: formData.get("bio") || null,
+      phone: formData.get("phone") || null,
+      linkedin: formData.get("linkedin") || null,
+      website: formData.get("website") || null,
+      skills: formData.get("skills") || null,
+      languages: formData.get("languages") || null,
+      interests: formData.get("interests") || null,
+      photoUrl: formData.get("photoUrl") || null,
+    };
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const res = await fetch("/api/auth/register-complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const body = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Error al registrar");
+      if (!res.ok) {
+        throw new Error(body.error || "Error al registrarse");
       }
 
-      router.push("/egresados/registro");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al registrar");
+      // Redirect to pending page
+      window.location.href = "/pendiente";
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-gray-50 to-blue-50 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Crea tu cuenta
-            </h1>
-            <p className="text-gray-600">
-              Únete a la Red de Egresados Internacionales
-            </p>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-gray-900">Registro de Egresado</h1>
+          <p className="text-gray-600 mt-2">Completa tus datos para unirte a la red</p>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+            {error}
           </div>
+        )}
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-700 text-sm">{error}</p>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Datos de acceso */}
+          <Section title="Datos de Acceso">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Username" name="username" required placeholder="Elige un username" />
+              <InputField label="Correo Electrónico" name="email" type="email" required placeholder="tu@email.com" />
+              <InputField label="Contraseña" name="password" type="password" required placeholder="Mínimo 6 caracteres" />
             </div>
-          )}
+          </Section>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
-                placeholder="Elige un username"
-                required
-                autoComplete="username"
-              />
+          {/* Información Personal */}
+          <Section title="Información Personal">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Nombre Completo" name="name" required placeholder="Juan Pérez García" />
+              <SelectField label="País de Residencia" name="country" required options={COUNTRIES} />
+              <InputField label="Ciudad" name="city" placeholder="Madrid" />
             </div>
+          </Section>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
-                placeholder="tu@email.com"
-                required
-                autoComplete="email"
-              />
+          {/* Formación */}
+          <Section title="Formación en Cuba">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SelectField label="Universidad" name="university" required options={UNIVERSITIES} />
+              <InputField label="Carrera Estudiada" name="career" required placeholder="Ingeniería Informática" />
+              <InputField label="Año de Graduación" name="graduationYear" type="number" required min={1960} max={2030} placeholder="2020" />
             </div>
+          </Section>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Contraseña
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
-                placeholder="••••••••"
-                required
-                autoComplete="new-password"
-              />
+          {/* Situación Profesional */}
+          <Section title="Situación Profesional Actual">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Profesión Actual" name="currentProfession" required placeholder="Desarrollador de Software" />
+              <InputField label="Empresa / Organización" name="currentCompany" placeholder="Tech Company S.A." />
             </div>
+          </Section>
 
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Confirmar Contraseña
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
-                placeholder="••••••••"
-                required
-                autoComplete="new-password"
-              />
+          {/* Perfil y Enlaces */}
+          <Section title="Perfil y Enlaces">
+            <div className="space-y-4">
+              <TextAreaField label="Biografía" name="bio" placeholder="Cuéntanos sobre tu trayectoria..." rows={4} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InputField label="LinkedIn" name="linkedin" placeholder="https://linkedin.com/in/tuperfil" />
+                <InputField label="Sitio Web" name="website" placeholder="https://tusitio.com" />
+              </div>
+              <InputField label="Habilidades" name="skills" placeholder="JavaScript, Gestión (separadas por coma)" />
+              <InputField label="Idiomas" name="languages" placeholder="Español, Inglés (separados por coma)" />
+              <InputField label="Intereses" name="interests" placeholder="Tecnología, Salud (separados por coma)" />
             </div>
+          </Section>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-8 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold text-base transition-colors"
-            >
-              {loading ? "Creando cuenta..." : "Crear Cuenta"}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
+          >
+            {loading ? "Registrando..." : "Enviar Registro"}
+          </button>
+        </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              ¿Ya tienes una cuenta?{" "}
-              <Link
-                href="/login"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Inicia sesión aquí
-              </Link>
-            </p>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <Link
-              href="/"
-              className="flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              Volver al inicio
-            </Link>
-          </div>
+        <div className="mt-6 text-center">
+          <Link href="/login" className="text-[#003f8f] hover:underline text-sm">
+            ← Ya tengo cuenta
+          </Link>
         </div>
       </div>
+    </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function InputField({ label, name, type = "text", required, placeholder, min, max }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        {label}{required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
+      />
+    </div>
+  );
+}
+
+function SelectField({ label, name, required, options }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        {label}{required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <select
+        name={name}
+        required={required}
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
+      >
+        <option value="">Seleccionar...</option>
+        {options.map((opt: string) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function TextAreaField({ label, name, placeholder, rows = 3 }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <textarea
+        name={name}
+        placeholder={placeholder}
+        rows={rows}
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm resize-none"
+      />
     </div>
   );
 }

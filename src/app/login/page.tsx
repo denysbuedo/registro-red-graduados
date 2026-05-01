@@ -31,6 +31,12 @@ export default function LoginPage() {
         throw new Error(data.error || "Error al iniciar sesión");
       }
 
+      // Si está pendiente, redirigir a completar perfil
+      if (data.pending && data.redirect) {
+        window.location.href = data.redirect;
+        return;
+      }
+
       // Recarga completa para actualizar el estado de autenticación en todo el app
       window.location.href = "/";
     } catch (err) {

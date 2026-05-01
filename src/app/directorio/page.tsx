@@ -14,9 +14,14 @@ export default async function DirectorioPage({
 }) {
   // Verificar autenticación
   const session = await getSession();
-  
+
   if (!session) {
     redirect("/login?redirect=/directorio");
+  }
+
+  // Redirigir usuarios pendientes a la página de espera
+  if (session.status === "pending") {
+    redirect("/pendiente");
   }
 
   const params = await searchParams;

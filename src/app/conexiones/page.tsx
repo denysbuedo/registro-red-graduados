@@ -37,7 +37,23 @@ export default function ConnectionsPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchData();
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/conexiones");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchData();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/conexiones");
+      });
   }, [activeTab]);
 
   const fetchData = async () => {

@@ -8,6 +8,7 @@ import { CreatePost } from "@/components/CreatePost";
 import { UserPostCard } from "@/components/UserPostCard";
 import { LoginForm } from "@/components/LoginForm";
 import { checkAndSendEventNotifications } from "@/lib/event-notifications";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,12 @@ export default async function Home() {
   await checkAndSendEventNotifications();
 
   const session = await getSession();
+  
+  // Redirigir usuarios pendientes a la página de espera
+  if (session?.status === "pending") {
+    redirect("/pendiente");
+  }
+  
   const isLoggedIn = !!session;
 
   const stats = await Promise.all([
