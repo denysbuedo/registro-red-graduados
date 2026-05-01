@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { postReactions, adminPosts } from "@/db/schema";
 import { getSession } from "@/lib/session";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 
 // GET - Obtener reacciones de un post
 export async function GET(request: NextRequest) {
@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const postIdNum = parseInt(postId);
+
     // Obtener conteo de reacciones por tipo
     const reactions = await db
       .select({
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
         count: sql<number>`count(*)`,
       })
       .from(postReactions)
-      .where(eq(postReactions.postId, parseInt(postId)))
+      .where(eq(postReactions.postId, postIdNum))
       .groupBy(postReactions.reactionType);
 
     // Obtener reacción del usuario actual si existe
@@ -35,15 +37,23 @@ export async function GET(request: NextRequest) {
         .select()
         .from(postReactions)
         .where(
-          eq(postReactions.postId, parseInt(postId)) &&
-          eq(postReactions.userId, session.id)
+          and(
+            eq(postReactions.postId, postIdNum),
+            eq(postReactions.userId, session.id)
+          )
         )
         .limit(1);
       userReaction = userReactionResult[0]?.reactionType || null;
     }
 
     // Formatear resultado
-    const result = {
+    const result: {
+      like: number;
+      love: number;
+      celebrate: number;
+      insightful: number;
+      userReaction: string | null;
+    } = {
       like: 0,
       love: 0,
       celebrate: 0,
@@ -52,7 +62,10 @@ export async function GET(request: NextRequest) {
     };
 
     reactions.forEach((r) => {
-      result[r.reactionType as keyof typeof result] = r.count;
+      const type = r.reactionType;
+      if (type === "like" || type === "love" || type === "celebrate" || type === "insightful") {
+        result[type] = r.count;
+      }
     });
 
     return NextResponse.json(result);
@@ -109,13 +122,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const postIdNum = parseInt(postId);
+
     // Verificar si ya tiene reacción
     const existingReaction = await db
       .select()
       .from(postReactions)
       .where(
-        eq(postReactions.postId, parseInt(postId)) &&
-        eq(postReactions.userId, session.id)
+        and(
+          eq(postReactions.postId, postIdNum),
+          eq(postReactions.userId, session.id)
+        )
       )
       .limit(1);
 
@@ -125,8 +142,10 @@ export async function POST(request: NextRequest) {
         await db
           .delete(postReactions)
           .where(
-            eq(postReactions.postId, parseInt(postId)) &&
-            eq(postReactions.userId, session.id)
+            and(
+              eq(postReactions.postId, postIdNum),
+              eq(postReactions.userId, session.id)
+            )
           );
 
         return NextResponse.json({
@@ -141,8 +160,10 @@ export async function POST(request: NextRequest) {
         .update(postReactions)
         .set({ reactionType })
         .where(
-          eq(postReactions.postId, parseInt(postId)) &&
-          eq(postReactions.userId, session.id)
+          and(
+            eq(postReactions.postId, postIdNum),
+            eq(postReactions.userId, session.id)
+          )
         );
 
       return NextResponse.json({

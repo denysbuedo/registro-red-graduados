@@ -81,34 +81,32 @@ export function AdminPostCard({
         if (data.success) {
           // Actualizar estado localmente
           setReactions(prev => {
-            const newReactions = { ...prev };
+            const newReactions = { ...prev } as any;
+            const rType = reactionType as keyof Reactions;
             
             // Si quitó la reacción
             if (data.action === "removed") {
-              newReactions[reactionType as keyof typeof newReactions] = 
-                Math.max(0, newReactions[reactionType as keyof typeof newReactions] - 1);
+              newReactions[rType] = Math.max(0, (newReactions[rType] as number) - 1);
               newReactions.userReaction = null;
             }
             // Si actualizó a una nueva reacción
             else if (data.action === "updated") {
               // Quitar la anterior
               if (prev.userReaction) {
-                newReactions[prev.userReaction as keyof typeof newReactions] = 
-                  Math.max(0, newReactions[prev.userReaction as keyof typeof newReactions] - 1);
+                const prevType = prev.userReaction as keyof Reactions;
+                newReactions[prevType] = Math.max(0, (newReactions[prevType] as number) - 1);
               }
               // Añadir la nueva
-              newReactions[reactionType as keyof typeof newReactions] = 
-                (newReactions[reactionType as keyof typeof newReactions] || 0) + 1;
+              newReactions[rType] = (newReactions[rType] as number || 0) + 1;
               newReactions.userReaction = reactionType;
             }
             // Si es nueva reacción
             else if (data.action === "created") {
-              newReactions[reactionType as keyof typeof newReactions] = 
-                (newReactions[reactionType as keyof typeof newReactions] || 0) + 1;
+              newReactions[rType] = (newReactions[rType] as number || 0) + 1;
               newReactions.userReaction = reactionType;
             }
             
-            return newReactions;
+            return newReactions as Reactions;
           });
         }
       }

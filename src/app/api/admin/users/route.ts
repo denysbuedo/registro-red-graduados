@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (role) {
-      conditions.push(eq(users.role, role));
+      conditions.push(eq(users.role, role as any));
     }
 
     const allUsers = await db

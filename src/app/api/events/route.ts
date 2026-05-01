@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Lista de eventos
-    let query = db
+    let baseQuery = db
       .select({
         id: events.id,
         title: events.title,
@@ -64,33 +64,16 @@ export async function GET(request: NextRequest) {
       })
       .from(events)
       .leftJoin(graduates, eq(events.organizerId, graduates.id))
-      .orderBy(desc(events.date));
+      .$dynamic();
 
     if (upcoming) {
       const now = new Date();
-      query = db
-        .select({
-          id: events.id,
-          title: events.title,
-          description: events.description,
-          date: events.date,
-          location: events.location,
-          type: events.type,
-          link: events.link,
-          maxAttendees: events.maxAttendees,
-          createdAt: events.createdAt,
-          organizerId: events.organizerId,
-          organizerName: graduates.name,
-          organizerPhoto: graduates.photoUrl,
-        })
-        .from(events)
-        .leftJoin(graduates, eq(events.organizerId, graduates.id))
-        .where(gte(events.date, now))
-        .orderBy(events.date)
-        .limit(20);
+      baseQuery = baseQuery.where(gte(events.date, now)).orderBy(events.date).limit(20);
+    } else {
+      baseQuery = baseQuery.orderBy(desc(events.date));
     }
 
-    const eventsList = await query;
+    const eventsList = await baseQuery;
 
     // Agregar contador de asistentes
     const eventsWithCount = await Promise.all(

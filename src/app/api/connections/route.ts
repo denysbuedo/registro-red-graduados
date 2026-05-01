@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Por defecto, contar pendientes
       const pendingCount = await db
-        .select({ count: db.$count() })
+        .select({ count: db.$count(connections) })
         .from(connections)
         .where(
           and(

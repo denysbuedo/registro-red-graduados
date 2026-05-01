@@ -201,7 +201,7 @@ export default function NewPostPage() {
                 rows={10}
               />
               <p className="mt-1 text-xs text-gray-500">
-                Mínimo 20 caracteres. El texto se mostrará parcialmente con opción "Leer más".
+                Mínimo 20 caracteres. El texto se mostrará parcialmente con opción &quot;Leer más&quot;.
               </p>
             </div>
 
@@ -252,7 +252,7 @@ export default function NewPostPage() {
           <ul className="text-sm text-blue-700 space-y-1">
             <li>• La noticia aparecerá en la página de inicio para todos los usuarios logueados</li>
             <li>• Se mostrará tu nombre de usuario como autor</li>
-            <li>• El contenido se mostrará parcialmente con botón "Leer más"</li>
+            <li>• El contenido se mostrará parcialmente con botón &quot;Leer más&quot;</li>
             <li>• La imagen es opcional pero recomendada para mayor visibilidad</li>
           </ul>
         </div>

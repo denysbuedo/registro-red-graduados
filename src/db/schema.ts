@@ -159,8 +159,8 @@ export const userPosts = sqliteTable("user_posts", {
   graduateId: integer("graduate_id").notNull().references(() => graduates.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
-  likes: integer("likes").default(0),
-  commentsCount: integer("comments_count").default(0),
+  likes: integer("likes").notNull().default(0),
+  commentsCount: integer("comments_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),

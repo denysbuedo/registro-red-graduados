@@ -379,11 +379,11 @@ export default async function GraduateProfilePage({
                   likes={post.likes}
                   commentsCount={post.commentsCount}
                   createdAt={post.createdAt}
-                  graduateId={post.graduateId}
-                  graduateName={post.graduateName}
+                  graduateId={post.graduateId ?? 0}
+                  graduateName={post.graduateName ?? ""}
                   graduatePhoto={post.graduatePhoto}
-                  graduateProfession={post.graduateProfession}
-                  graduateCountry={post.graduateCountry}
+                  graduateProfession={post.graduateProfession ?? ""}
+                  graduateCountry={post.graduateCountry ?? ""}
                 />
               ))}
             </div>

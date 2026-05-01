@@ -48,9 +48,9 @@ export default async function Home() {
     .limit(6);
 
   // Get posts for logged-in users
-  let adminPostsData = [];
-  let userPostsData = [];
-  let userGraduateId = null;
+  let adminPostsData: any[] = [];
+  let userPostsData: any[] = [];
+  let userGraduateId: number | null = null;
 
   if (isLoggedIn) {
     const userGraduate = await db
@@ -94,10 +94,22 @@ export default async function Home() {
       .limit(20);
   }
 
+  // eslint-disable-next-line react-hooks/purity
+  const nowSec = Math.floor(Date.now() / 1000);
+
   // ============================================
   // HOME PARA USUARIOS LOGUEADOS
   // ============================================
   if (isLoggedIn) {
+    const pinned = adminPostsData.filter((p) => {
+      if (!p.pinnedUntil) return false;
+      return p.pinnedUntil >= nowSec;
+    });
+    const regular = adminPostsData.filter((p) => {
+      if (!p.pinnedUntil) return true;
+      return p.pinnedUntil < nowSec;
+    });
+
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -151,108 +163,92 @@ export default async function Home() {
               </div>
 
               {/* Pinned News */}
-              {(() => {
-                const nowSec = Math.floor(Date.now() / 1000);
-                const pinned = adminPostsData.filter((p) => {
-                  if (!p.pinnedUntil) return false;
-                  return p.pinnedUntil >= nowSec;
-                });
-                const regular = adminPostsData.filter((p) => {
-                  if (!p.pinnedUntil) return true;
-                  return p.pinnedUntil < nowSec;
-                });
-
-                return (
-                  <>
-                    {pinned.length > 0 && (
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                          </svg>
-                          Noticias Destacadas
-                        </h2>
-                        <div className="space-y-4">
-                          {pinned.map((post) => (
-                            <div key={post.id} className="border-2 border-red-200 bg-red-50/30 rounded-xl overflow-hidden">
-                              <AdminPostCard
-                                key={post.id}
-                                id={post.id}
-                                title={post.title}
-                                content={post.content}
-                                imageUrl={post.imageUrl}
-                                authorName={post.authorName}
-                                createdAt={post.createdAt}
-                              />
-                            </div>
-                          ))}
-                        </div>
+              {pinned.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    Noticias Destacadas
+                  </h2>
+                  <div className="space-y-4">
+                    {pinned.map((post) => (
+                      <div key={post.id} className="border-2 border-red-200 bg-red-50/30 rounded-xl overflow-hidden">
+                        <AdminPostCard
+                          key={post.id}
+                          id={post.id}
+                          title={post.title}
+                          content={post.content}
+                          imageUrl={post.imageUrl}
+                          authorName={post.authorName}
+                          createdAt={post.createdAt}
+                        />
                       </div>
-                    )}
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                    {/* Activity Feed */}
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900 mb-4">Feed de Actividad</h2>
-                      {userPostsData.length > 0 ? (
-                        <div className="space-y-4">
-                          {userPostsData.map((post) => (
-                            <UserPostCard
-                              key={post.id}
-                              id={post.id}
-                              content={post.content}
-                              imageUrl={post.imageUrl}
-                              likes={post.likes}
-                              commentsCount={post.commentsCount}
-                              createdAt={post.createdAt}
-                              graduateId={post.graduateId}
-                              graduateName={post.graduateName}
-                              graduatePhoto={post.graduatePhoto}
-                              graduateProfession={post.graduateProfession}
-                              graduateCountry={post.graduateCountry}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-                          <p className="text-gray-500">Sé el primero en publicar</p>
-                        </div>
-                      )}
-                    </div>
+              {/* Activity Feed */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Feed de Actividad</h2>
+                {userPostsData.length > 0 ? (
+                  <div className="space-y-4">
+                    {userPostsData.map((post) => (
+                      <UserPostCard
+                        key={post.id}
+                        id={post.id}
+                        content={post.content}
+                        imageUrl={post.imageUrl}
+                        likes={post.likes}
+                        commentsCount={post.commentsCount}
+                        createdAt={post.createdAt}
+                        graduateId={post.graduateId}
+                        graduateName={post.graduateName}
+                        graduatePhoto={post.graduatePhoto}
+                        graduateProfession={post.graduateProfession}
+                        graduateCountry={post.graduateCountry}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+                    <p className="text-gray-500">Sé el primero en publicar</p>
+                  </div>
+                )}
+              </div>
 
-                    {/* Regular News */}
-                    {regular.length > 0 && (
-                      <div className="pt-6 border-t border-gray-200">
-                        <div className="flex items-center justify-between mb-4">
-                          <h2 className="text-xl font-bold text-gray-900">Noticias</h2>
-                          {session?.role === 'admin' && (
-                            <Link href="/admin/posts/new" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
-                              + Nueva Noticia
-                            </Link>
-                          )}
-                        </div>
-                        <div className="grid gap-6">
-                          {regular.map((post) => (
-                            <AdminPostCard
-                              key={post.id}
-                              id={post.id}
-                              title={post.title}
-                              content={post.content}
-                              imageUrl={post.imageUrl}
-                              authorName={post.authorName}
-                              createdAt={post.createdAt}
-                            />
-                          ))}
-                        </div>
-                        <div className="text-center mt-4">
-                          <Link href="/noticias" className="text-[#003f8f] hover:underline text-sm font-medium">
-                            Ver todas las noticias →
-                          </Link>
-                        </div>
-                      </div>
+              {/* Regular News */}
+              {regular.length > 0 && (
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-gray-900">Noticias</h2>
+                    {session?.role === 'admin' && (
+                      <Link href="/admin/posts/new" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                        + Nueva Noticia
+                      </Link>
                     )}
-                  </>
-                );
-              })()}
+                  </div>
+                  <div className="grid gap-6">
+                    {regular.map((post) => (
+                      <AdminPostCard
+                        key={post.id}
+                        id={post.id}
+                        title={post.title}
+                        content={post.content}
+                        imageUrl={post.imageUrl}
+                        authorName={post.authorName}
+                        createdAt={post.createdAt}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-center mt-4">
+                    <Link href="/noticias" className="text-[#003f8f] hover:underline text-sm font-medium">
+                      Ver todas las noticias →
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
