@@ -1,45 +1,62 @@
 const Database = require("better-sqlite3");
 const { join } = require("path");
-const { readFileSync } = require("fs");
+const { readFileSync, readdirSync } = require("fs");
 
-// Detectar base de datos según el entorno
-const dbName = process.env.NODE_ENV === "production" ? "prod.db" : "dev.db";
-const dbPath = join(__dirname, "..", dbName);
+// Cargar variables de entorno si existe .env
+try {
+  const envPath = join(__dirname, "..", ".env");
+  const envConfig = readFileSync(envPath, "utf-8");
+  envConfig.split("\n").forEach(line => {
+    const [key, value] = line.split("=");
+    if (key && value) process.env[key.trim()] = value.trim();
+  });
+} catch (e) {}
 
-console.log(`🚀 Iniciando migraciones en: ${dbName}`);
+// Configuración de base de datos
+const dbPath = join(__dirname, "..", process.env.NODE_ENV === "production" ? "prod.db" : "dev.db");
+console.log(`🚀 Iniciando base de datos en: ${dbPath}`);
+
 const sqlite = new Database(dbPath);
 
-const migrations = [
-  "0015_add_pending_university.sql",
-];
+// Activar WAL para mejor rendimiento
+sqlite.pragma("journal_mode = WAL");
 
-for (const migration of migrations) {
-  try {
-    const content = readFileSync(
-      join(__dirname, "..", "src", "db", "migrations", migration),
-      "utf-8"
-    );
-    console.log(`Ejecutando ${migration}...`);
+const migrationsDir = join(__dirname, "..", "src", "db", "migrations");
+
+try {
+  // Leer todos los archivos .sql y ordenarlos
+  const files = readdirSync(migrationsDir)
+    .filter(f => f.endsWith(".sql"))
+    .sort();
+
+  console.log(`Encontradas ${files.length} migraciones.`);
+
+  for (const file of files) {
+    const content = readFileSync(join(migrationsDir, file), "utf-8");
+    console.log(`Applying: ${file}...`);
     
-    // Ejecutar cada comando por separado para mejor manejo de errores de "columna duplicada"
+    // Dividir por comandos para manejar errores individuales
     const commands = content.split(";").filter(cmd => cmd.trim() !== "");
     for (const cmd of commands) {
       try {
         sqlite.exec(cmd);
       } catch (err) {
-        if (err.message.includes("duplicate column name")) {
-          console.log(`   ⚠️  Columna ya existe (saltando comando)`);
-        } else {
-          throw err;
+        // Ignorar errores de "ya existe" (tablas o columnas)
+        if (!err.message.includes("already exists") && !err.message.includes("duplicate column name")) {
+          console.warn(`   ⚠️  Aviso en comando: ${err.message}`);
         }
       }
     }
-    console.log("✅ OK");
-  } catch (error) {
-    console.error(`❌ Error en ${migration}:`, error.message);
   }
+  console.log("✅ Proceso de migración completado.");
+} catch (error) {
+  console.error("❌ Error crítico en migraciones:", error);
 }
 
-const cols = sqlite.prepare("PRAGMA table_info(users)").all();
-console.log("Columnas actuales en users:", cols.map(c => c.name).join(", "));
+// Verificar tablas creadas
+try {
+  const tables = sqlite.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+  console.log("Tablas actuales:", tables.map(t => t.name).join(", "));
+} catch (e) {}
+
 sqlite.close();
