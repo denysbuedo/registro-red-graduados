@@ -27,10 +27,10 @@ if (existingUser) {
   
   const passwordHash = bcrypt.hashSync(password, 10);
   sqlite
-    .prepare("UPDATE users SET password_hash = ? WHERE username = ? OR email = ?")
+    .prepare("UPDATE users SET password_hash = ?, status = 'approved' WHERE username = ? OR email = ?")
     .run(passwordHash, username, email);
   
-  console.log("✅ Contraseña actualizada exitosamente!");
+  console.log("✅ Contraseña y estado (approved) actualizados exitosamente!");
 } else {
   // Hashear contraseña
   const passwordHash = bcrypt.hashSync(password, 10);
@@ -39,8 +39,8 @@ if (existingUser) {
   try {
     const result = sqlite
       .prepare(
-        `INSERT INTO users (username, email, password_hash, role, created_at, updated_at) 
-         VALUES (?, ?, ?, 'admin', strftime('%s', 'now'), strftime('%s', 'now'))`
+        `INSERT INTO users (username, email, password_hash, role, status, created_at, updated_at) 
+         VALUES (?, ?, ?, 'admin', 'approved', strftime('%s', 'now'), strftime('%s', 'now'))`
       )
       .run(username, email, passwordHash);
 

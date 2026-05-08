@@ -54,7 +54,8 @@ nano .env
 Contenido recomendado:
 ```env
 NODE_ENV=production
-NEXTAUTH_SECRET=tu_secreto_aleatorio_de_32_caracteres
+NEXTAUTH_URL=https://egresados.mes.gob.cu
+NEXTAUTH_SECRET=9f8c7d6e5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d
 DATABASE_URL=file:./prod.db
 ```
 
