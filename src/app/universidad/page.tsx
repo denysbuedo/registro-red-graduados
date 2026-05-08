@@ -150,7 +150,17 @@ export default async function UniversidadPage() {
                   <div key={grad.id} className="border-b border-gray-100 py-3 last:border-b-0">
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{grad.name}</p>
+                        <Link 
+                          href={`/egresados/${grad.id}`} 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-bold text-[#003f8f] hover:underline flex items-center gap-1.5"
+                        >
+                          {grad.name}
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </Link>
                         <p className="text-xs text-gray-500">{grad.career} ({grad.graduationYear})</p>
                         <p className="text-xs text-gray-500">{grad.country}</p>
                       </div>
