@@ -20,6 +20,23 @@ export default function RegistroPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [postgraduates, setPostgraduates] = useState<{ university: string; program: string; year: string }[]>([]);
+
+  const addPostgraduate = () => {
+    setPostgraduates([...postgraduates, { university: "", program: "", year: "" }]);
+  };
+
+  const removePostgraduate = (index: number) => {
+    const newPg = [...postgraduates];
+    newPg.splice(index, 1);
+    setPostgraduates(newPg);
+  };
+
+  const handlePostgraduateChange = (index: number, field: string, value: string) => {
+    const newPg = [...postgraduates];
+    newPg[index] = { ...newPg[index], [field]: value };
+    setPostgraduates(newPg);
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,9 +59,7 @@ export default function RegistroPage() {
       career: formData.get("career"),
       graduationYear: parseInt(formData.get("graduationYear") as string),
       pregradoModalidad: formData.get("pregradoModalidad"),
-      postgradoUniversity: formData.get("postgradoUniversity") || null,
-      postgradoProgram: formData.get("postgradoProgram") || null,
-      postgradoYear: formData.get("postgradoYear") ? parseInt(formData.get("postgradoYear") as string) : null,
+      postgraduates: postgraduates.filter(pg => pg.university && pg.program && pg.year),
       otherAcademicProgram: formData.get("otherAcademicProgram") || null,
       otherCubanInstitution: formData.get("otherCubanInstitution") || null,
       currentProfession: formData.get("currentProfession"),
@@ -128,8 +143,22 @@ export default function RegistroPage() {
                 <InputField label="Fecha de Nacimiento" name="birthDate" type="date" required />
                 <SelectField label="País de Nacimiento" name="birthCountry" required options={COUNTRIES} />
                 <SelectField label="País donde Reside" name="country" required options={COUNTRIES} />
-                <InputField label="Número de Pasaporte" name="passport" placeholder="Opcional" />
-                <InputField label="Teléfono (WhatsApp/WeChat/Telegram)" name="phone" required placeholder="+1 ..." />
+                <InputField 
+                  label="Número de Pasaporte" 
+                  name="passport" 
+                  placeholder="Opcional" 
+                  pattern="^[A-Za-z0-9]+$"
+                  title="Solo letras y números, sin espacios"
+                  maxLength={20}
+                />
+                <InputField 
+                  label="Teléfono (WhatsApp/WeChat/Telegram)" 
+                  name="phone" 
+                  required 
+                  placeholder="+1 ..." 
+                  pattern="^\+?[0-9\s\-]{7,20}$"
+                  title="Número de teléfono válido (puede incluir +, espacios o guiones)"
+                />
                 <div className="sm:col-span-2">
                   <InputField label="URL Foto de Perfil" name="photoUrl" placeholder="https://..." />
                 </div>
@@ -161,20 +190,55 @@ export default function RegistroPage() {
 
             {/* Sección 4: Académica Postgrado */}
             <FormSection title="Formación de Postgrado (Si aplica)" icon={<AcademicIcon />}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="sm:col-span-2">
-                  <SelectField label="IES de Postgrado" name="postgradoUniversity" options={UNIVERSITIES} />
-                </div>
-                <SelectField 
-                  label="Tipo de Programa" 
-                  name="postgradoProgram" 
-                  options={[
-                    { value: "maestria", label: "Maestría" },
-                    { value: "doctorado", label: "Doctorado" },
-                    { value: "especialidad", label: "Especialidad Médica/Técnica" }
-                  ]} 
-                />
-                <InputField label="Año de Graduación Postgrado" name="postgradoYear" type="number" min={1960} max={2030} />
+              <div className="space-y-6">
+                {postgraduates.map((pg, index) => (
+                  <div key={index} className="p-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] relative">
+                    <button 
+                      type="button" 
+                      onClick={() => removePostgraduate(index)}
+                      className="absolute top-4 right-4 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                      <div className="sm:col-span-2">
+                        <SelectField 
+                          label="IES de Postgrado" 
+                          value={pg.university} 
+                          onChange={(e: any) => handlePostgraduateChange(index, "university", e.target.value)}
+                          options={UNIVERSITIES} 
+                        />
+                      </div>
+                      <SelectField 
+                        label="Tipo de Programa" 
+                        value={pg.program} 
+                        onChange={(e: any) => handlePostgraduateChange(index, "program", e.target.value)}
+                        options={[
+                          { value: "maestria", label: "Maestría" },
+                          { value: "doctorado", label: "Doctorado" },
+                          { value: "especialidad", label: "Especialidad Médica/Técnica" }
+                        ]} 
+                      />
+                      <InputField 
+                        label="Año de Graduación" 
+                        type="number" 
+                        min={1960} 
+                        max={2030} 
+                        value={pg.year}
+                        onChange={(e: any) => handlePostgraduateChange(index, "year", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                <button 
+                  type="button" 
+                  onClick={addPostgraduate}
+                  className="w-full py-4 border-2 border-dashed border-blue-200 text-blue-600 rounded-[2rem] font-bold hover:bg-blue-50 hover:border-blue-300 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                  Añadir Programa de Postgrado
+                </button>
               </div>
             </FormSection>
 
@@ -190,7 +254,13 @@ export default function RegistroPage() {
             {/* Sección 6: Redes */}
             <FormSection title="Perfil Digital y Competencias" icon={<GlobeIcon />}>
               <div className="space-y-6">
-                <TextAreaField label="Biografía Profesional" name="bio" placeholder="Cuéntanos un poco sobre tu trayectoria y logros..." rows={5} />
+                <TextAreaField 
+                  label="Biografía Profesional (Máx 200 caracteres)" 
+                  name="bio" 
+                  placeholder="Cuéntanos un poco sobre tu trayectoria y logros..." 
+                  rows={4} 
+                  maxLength={200}
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <InputField label="LinkedIn URL" name="linkedin" placeholder="https://..." />
                   <InputField label="Sitio Web / Blog" name="website" placeholder="https://..." />
@@ -246,7 +316,7 @@ function FormSection({ title, icon, children }: { title: string; icon: React.Rea
   );
 }
 
-function InputField({ label, name, type = "text", required, placeholder, min, max }: any) {
+function InputField({ label, name, type = "text", required, placeholder, min, max, pattern, title, maxLength, value, onChange }: any) {
   return (
     <div className="space-y-2">
       <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">
@@ -259,13 +329,18 @@ function InputField({ label, name, type = "text", required, placeholder, min, ma
         placeholder={placeholder}
         min={min}
         max={max}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
+        value={value}
+        onChange={onChange}
         className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none placeholder-gray-300"
       />
     </div>
   );
 }
 
-function SelectField({ label, name, required, options }: any) {
+function SelectField({ label, name, required, options, value, onChange }: any) {
   return (
     <div className="space-y-2">
       <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">
@@ -275,13 +350,15 @@ function SelectField({ label, name, required, options }: any) {
         <select
           name={name}
           required={required}
+          value={value}
+          onChange={onChange}
           className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none appearance-none cursor-pointer"
         >
           <option value="" className="text-gray-400">Seleccionar opción...</option>
           {options.map((opt: any) => {
-            const value = typeof opt === 'string' ? opt : opt.value;
+            const optValue = typeof opt === 'string' ? opt : opt.value;
             const labelText = typeof opt === 'string' ? opt : opt.label;
-            return <option key={value} value={value}>{labelText}</option>;
+            return <option key={optValue} value={optValue}>{labelText}</option>;
           })}
         </select>
         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
@@ -294,14 +371,17 @@ function SelectField({ label, name, required, options }: any) {
   );
 }
 
-function TextAreaField({ label, name, placeholder, rows = 3 }: any) {
+function TextAreaField({ label, name, placeholder, rows = 3, maxLength }: any) {
   return (
     <div className="space-y-2">
-      <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">{label}</label>
+      <div className="flex justify-between items-center ml-1">
+        <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest">{label}</label>
+      </div>
       <textarea
         name={name}
         placeholder={placeholder}
         rows={rows}
+        maxLength={maxLength}
         className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none resize-none placeholder-gray-300"
       />
     </div>

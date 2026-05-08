@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { users, graduates } from "@/db/schema";
+import { users, graduates, graduatePostgraduates } from "@/db/schema";
 import { hashPassword } from "@/lib/auth";
 import { setSession } from "@/lib/session";
 import { eq, or } from "drizzle-orm";
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       username, email, password, university, name, 
       birthDate, birthCountry, country, passport, phone,
       career, graduationYear, pregradoModalidad,
-      postgradoUniversity, postgradoProgram, postgradoYear,
+      postgraduates,
       otherAcademicProgram, otherCubanInstitution,
       currentProfession, currentCompany, city, 
       bio, photoUrl, linkedin, website, skills, languages, interests
@@ -74,9 +74,6 @@ export async function POST(request: NextRequest) {
         career,
         graduationYear,
         pregradoModalidad: pregradoModalidad as any,
-        postgradoUniversity,
-        postgradoProgram: postgradoProgram as any,
-        postgradoYear,
         otherAcademicProgram,
         otherCubanInstitution,
         currentProfession,
@@ -93,6 +90,18 @@ export async function POST(request: NextRequest) {
       .returning();
 
     const newGraduate = graduateResult[0];
+
+    // Insertar múltiples postgrados si existen
+    if (postgraduates && Array.isArray(postgraduates) && postgraduates.length > 0) {
+      await db.insert(graduatePostgraduates).values(
+        postgraduates.map(pg => ({
+          graduateId: newGraduate.id,
+          program: pg.program,
+          university: pg.university,
+          year: parseInt(pg.year),
+        }))
+      );
+    }
 
     // 3. Vincular el graduateId al usuario
     await db

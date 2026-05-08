@@ -20,6 +20,7 @@
  */
 
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql, relations } from "drizzle-orm";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -289,3 +290,26 @@ export const eventNotificationLog = sqliteTable("event_notification_log", {
     () => new Date()
   ),
 });
+
+export const graduatePostgraduates = sqliteTable('graduate_postgraduates', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  graduateId: integer('graduate_id').notNull().references(() => graduates.id, { onDelete: 'cascade' }),
+  program: text('program').notNull(),
+  university: text('university').notNull(),
+  year: integer('year').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+});
+export const graduatePostgraduatesRelations = relations(graduatePostgraduates, ({ one }) => ({
+  graduate: one(graduates, {
+    fields: [graduatePostgraduates.graduateId],
+    references: [graduates.id],
+  }),
+}));
+export const graduatesRelations = relations(graduates, ({ many, one }) => ({
+  user: one(users, {
+    fields: [graduates.userId],
+    references: [users.id],
+  }),
+  postgraduates: many(graduatePostgraduates),
+}));
+

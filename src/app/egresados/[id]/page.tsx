@@ -20,17 +20,16 @@ export default async function GraduateProfilePage({
   const graduateId = parseInt(id);
 
   // Obtener datos del egresado
-  const graduateData = await db
-    .select()
-    .from(graduates)
-    .where(eq(graduates.id, graduateId))
-    .limit(1);
+  const graduate = await db.query.graduates.findFirst({
+    where: eq(graduates.id, graduateId),
+    with: {
+      postgraduates: true,
+    },
+  });
 
-  if (graduateData.length === 0) {
+  if (!graduate) {
     notFound();
   }
-
-  const graduate = graduateData[0];
 
   // Verificar permisos
   let canViewProfile = false;
@@ -131,7 +130,7 @@ export default async function GraduateProfilePage({
             <div className="flex flex-col md:flex-row items-center md:items-end gap-8">
               {/* Avatar con Efecto */}
               <div className="relative shrink-0">
-                <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-full border-8 border-white bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl overflow-hidden flex items-center justify-center text-white font-bold text-5xl">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-gradient-to-br from-blue-500 to-blue-700 shadow-2xl overflow-hidden flex items-center justify-center text-white font-bold text-3xl">
                   {graduate.photoUrl ? (
                     <img src={graduate.photoUrl} alt={graduate.name} className="w-full h-full object-cover transition-transform hover:scale-110 duration-500" />
                   ) : (
@@ -148,7 +147,7 @@ export default async function GraduateProfilePage({
               {/* Información Principal */}
               <div className="flex-1 text-center md:text-left pt-2">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                  <h1 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
                     {graduate.name}
                   </h1>
                   <span className="inline-flex items-center px-4 py-1 bg-blue-50 text-[#003f8f] rounded-full text-xs font-bold uppercase tracking-widest border border-blue-100">
@@ -156,7 +155,7 @@ export default async function GraduateProfilePage({
                   </span>
                 </div>
                 
-                <p className="text-lg sm:text-xl font-medium text-gray-600 mb-6 flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <p className="text-sm sm:text-base font-medium text-gray-600 mb-6 flex flex-wrap items-center justify-center md:justify-start gap-2">
                   <span className="text-blue-600">{graduate.currentProfession}</span>
                   {graduate.currentCompany && <span className="text-gray-400">en <span className="text-gray-700">{graduate.currentCompany}</span></span>}
                 </p>
@@ -231,7 +230,7 @@ export default async function GraduateProfilePage({
           {/* Biografía / Sobre mí */}
           {graduate.bio && (
             <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 border border-gray-100 shadow-xl shadow-slate-200/50">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
                   <StarIcon />
                 </div>
@@ -270,20 +269,24 @@ export default async function GraduateProfilePage({
                 </div>
               </div>
 
-              {/* Postgrado */}
-              {(graduate.postgradoUniversity || graduate.postgradoProgram) && (
-                <div className="relative pl-8 border-l-2 border-indigo-100">
+              {/* Postgrados Múltiples */}
+              {graduate.postgraduates && graduate.postgraduates.length > 0 && (
+                <div className="relative pl-8 border-l-2 border-indigo-100 space-y-6">
                   <div className="absolute -left-[9px] top-0 w-4 h-4 bg-indigo-600 rounded-full border-4 border-white"></div>
                   <div className="mb-1">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">Postgrado</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 capitalize">{graduate.postgradoProgram}</h3>
-                  <p className="text-gray-700 font-medium">{graduate.postgradoUniversity}</p>
-                  {graduate.postgradoYear && (
-                    <div className="mt-3 flex gap-4 text-sm text-gray-500">
-                      <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> Concluido en {graduate.postgradoYear}</span>
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 gap-4">
+                    {graduate.postgraduates.map((pg: any) => (
+                      <div key={pg.id} className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
+                        <h3 className="text-xl font-bold text-gray-900 capitalize">{pg.program}</h3>
+                        <p className="text-gray-700 font-medium">{pg.university}</p>
+                        <div className="mt-2 flex gap-4 text-sm text-gray-500">
+                          <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> Concluido en {pg.year}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -348,11 +351,13 @@ export default async function GraduateProfilePage({
 
 function SectionCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-lg shadow-slate-200/40">
-      <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-3">
-        <span className="text-blue-600">{icon}</span>
-        {title}
-      </h3>
+    <div className="bg-white rounded-[2rem] p-6 sm:p-8 border border-gray-100 shadow-xl shadow-slate-200/50">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#003f8f]">
+          {icon}
+        </div>
+        <h2 className="text-base font-bold text-gray-900">{title}</h2>
+      </div>
       {children}
     </div>
   );

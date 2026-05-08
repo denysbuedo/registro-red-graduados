@@ -23,6 +23,23 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<any>(null);
+  const [postgraduates, setPostgraduates] = useState<{ id?: number; university: string; program: string; year: string }[]>([]);
+
+  const addPostgraduate = () => {
+    setPostgraduates([...postgraduates, { university: "", program: "", year: "" }]);
+  };
+
+  const removePostgraduate = (index: number) => {
+    const newPg = [...postgraduates];
+    newPg.splice(index, 1);
+    setPostgraduates(newPg);
+  };
+
+  const handlePostgraduateChange = (index: number, field: string, value: string) => {
+    const newPg = [...postgraduates];
+    newPg[index] = { ...newPg[index], [field]: value };
+    setPostgraduates(newPg);
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -44,6 +61,9 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
         }
 
         setFormData(data);
+        if (data.postgraduates) {
+          setPostgraduates(data.postgraduates);
+        }
       } else {
         setError("No se pudo cargar el perfil.");
       }
@@ -72,9 +92,7 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
       career: (form.elements.namedItem("career") as HTMLInputElement).value,
       graduationYear: parseInt((form.elements.namedItem("graduationYear") as HTMLInputElement).value),
       pregradoModalidad: (form.elements.namedItem("pregradoModalidad") as HTMLSelectElement).value,
-      postgradoUniversity: (form.elements.namedItem("postgradoUniversity") as HTMLSelectElement).value || null,
-      postgradoProgram: (form.elements.namedItem("postgradoProgram") as HTMLSelectElement).value || null,
-      postgradoYear: (form.elements.namedItem("postgradoYear") as HTMLInputElement).value ? parseInt((form.elements.namedItem("postgradoYear") as HTMLInputElement).value) : null,
+      postgraduates: postgraduates.filter(pg => pg.university && pg.program && pg.year),
       otherAcademicProgram: (form.elements.namedItem("otherAcademicProgram") as HTMLInputElement).value || null,
       otherCubanInstitution: (form.elements.namedItem("otherCubanInstitution") as HTMLInputElement).value || null,
       currentProfession: (form.elements.namedItem("currentProfession") as HTMLInputElement).value,
@@ -166,8 +184,24 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
               <InputField label="Fecha de Nacimiento" name="birthDate" type="date" required defaultValue={formData?.birthDate} />
               <SelectField label="País de Nacimiento" name="birthCountry" required defaultValue={formData?.birthCountry} options={COUNTRIES} />
               <SelectField label="Residencia Actual" name="country" required defaultValue={formData?.country} options={COUNTRIES} />
-              <InputField label="Nro. de Pasaporte" name="passport" defaultValue={formData?.passport} placeholder="Opcional" />
-              <InputField label="Teléfono / WhatsApp" name="phone" required defaultValue={formData?.phone} placeholder="+53 ..." />
+              <InputField 
+                label="Nro. de Pasaporte" 
+                name="passport" 
+                defaultValue={formData?.passport} 
+                placeholder="Opcional"
+                pattern="^[A-Za-z0-9]+$"
+                title="Solo letras y números, sin espacios"
+                maxLength={20}
+              />
+              <InputField 
+                label="Teléfono / WhatsApp" 
+                name="phone" 
+                required 
+                defaultValue={formData?.phone} 
+                placeholder="+53 ..."
+                pattern="^\+?[0-9\s\-]{7,20}$"
+                title="Número de teléfono válido"
+              />
               <div className="md:col-span-2">
                 <InputField label="URL Foto de Perfil" name="photoUrl" defaultValue={formData?.photoUrl} placeholder="https://..." />
               </div>
@@ -196,21 +230,55 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
             
             <div className="mt-10 pt-8 border-t border-gray-100">
               <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6">Estudios de Postgrado</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <SelectField label="IES de Postgrado" name="postgradoUniversity" defaultValue={formData?.postgradoUniversity} options={UNIVERSITIES} />
-                </div>
-                <SelectField 
-                  label="Programa de Postgrado" 
-                  name="postgradoProgram" 
-                  defaultValue={formData?.postgradoProgram} 
-                  options={[
-                    { value: "maestria", label: "Maestría" },
-                    { value: "doctorado", label: "Doctorado" },
-                    { value: "especialidad", label: "Especialidad Médica/Técnica" }
-                  ]} 
-                />
-                <InputField label="Año de Conclusión" name="postgradoYear" type="number" defaultValue={formData?.postgradoYear} />
+              <div className="space-y-6">
+                {postgraduates.map((pg, index) => (
+                  <div key={index} className="p-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] relative">
+                    <button 
+                      type="button" 
+                      onClick={() => removePostgraduate(index)}
+                      className="absolute top-4 right-4 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                      <div className="sm:col-span-2">
+                        <SelectField 
+                          label="IES de Postgrado" 
+                          value={pg.university} 
+                          onChange={(e: any) => handlePostgraduateChange(index, "university", e.target.value)}
+                          options={UNIVERSITIES} 
+                        />
+                      </div>
+                      <SelectField 
+                        label="Tipo de Programa" 
+                        value={pg.program} 
+                        onChange={(e: any) => handlePostgraduateChange(index, "program", e.target.value)}
+                        options={[
+                          { value: "maestria", label: "Maestría" },
+                          { value: "doctorado", label: "Doctorado" },
+                          { value: "especialidad", label: "Especialidad Médica/Técnica" }
+                        ]} 
+                      />
+                      <InputField 
+                        label="Año de Graduación" 
+                        type="number" 
+                        min={1960} 
+                        max={2030} 
+                        value={pg.year}
+                        onChange={(e: any) => handlePostgraduateChange(index, "year", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                <button 
+                  type="button" 
+                  onClick={addPostgraduate}
+                  className="w-full py-4 border-2 border-dashed border-blue-200 text-blue-600 rounded-[2rem] font-bold hover:bg-blue-50 hover:border-blue-300 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                  Añadir Programa de Postgrado
+                </button>
               </div>
             </div>
 
@@ -233,7 +301,14 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
 
           <FormSection title="Biografía y Competencias" icon={<GlobeIcon />}>
             <div className="space-y-6">
-              <TextAreaField label="Bio Profesional" name="bio" rows={5} defaultValue={formData?.bio} placeholder="Escribe una breve descripción sobre ti..." />
+              <TextAreaField 
+                label="Bio Profesional (Máx 200 caracteres)" 
+                name="bio" 
+                rows={5} 
+                defaultValue={formData?.bio} 
+                placeholder="Escribe una breve descripción sobre ti..." 
+                maxLength={200}
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InputField label="LinkedIn URL" name="linkedin" defaultValue={formData?.linkedin} placeholder="https://linkedin.com/in/..." />
                 <InputField label="Sitio Web / Portfolio" name="website" defaultValue={formData?.website} placeholder="https://..." />
@@ -293,7 +368,7 @@ function FormSection({ title, icon, children }: { title: string; icon: React.Rea
   );
 }
 
-function InputField({ label, name, type = "text", required, defaultValue, placeholder }: any) {
+function InputField({ label, name, type = "text", required, defaultValue, placeholder, pattern, title, maxLength, value, onChange, min, max }: any) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-black text-gray-400 uppercase tracking-widest pl-1">{label}</label>
@@ -303,13 +378,20 @@ function InputField({ label, name, type = "text", required, defaultValue, placeh
         required={required}
         defaultValue={defaultValue}
         placeholder={placeholder}
+        pattern={pattern}
+        title={title}
+        maxLength={maxLength}
+        value={value}
+        onChange={onChange}
+        min={min}
+        max={max}
         className="w-full px-5 py-4 bg-[#f8fafc] border border-gray-100 rounded-2xl text-gray-900 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none placeholder-gray-300"
       />
     </div>
   );
 }
 
-function SelectField({ label, name, required, defaultValue, options }: any) {
+function SelectField({ label, name, required, defaultValue, options, value, onChange }: any) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-black text-gray-400 uppercase tracking-widest pl-1">{label}</label>
@@ -317,20 +399,22 @@ function SelectField({ label, name, required, defaultValue, options }: any) {
         name={name}
         required={required}
         defaultValue={defaultValue}
+        value={value}
+        onChange={onChange}
         className="w-full px-5 py-4 bg-[#f8fafc] border border-gray-100 rounded-2xl text-gray-900 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none appearance-none"
       >
         <option value="" className="text-gray-400">Seleccionar opción...</option>
         {options.map((opt: any) => {
-          const value = typeof opt === 'string' ? opt : opt.value;
+          const optValue = typeof opt === 'string' ? opt : opt.value;
           const labelText = typeof opt === 'string' ? opt : opt.label;
-          return <option key={value} value={value}>{labelText}</option>;
+          return <option key={optValue} value={optValue}>{labelText}</option>;
         })}
       </select>
     </div>
   );
 }
 
-function TextAreaField({ label, name, rows = 3, defaultValue, placeholder }: any) {
+function TextAreaField({ label, name, rows = 3, defaultValue, placeholder, maxLength }: any) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-black text-gray-400 uppercase tracking-widest pl-1">{label}</label>
@@ -339,6 +423,7 @@ function TextAreaField({ label, name, rows = 3, defaultValue, placeholder }: any
         rows={rows}
         defaultValue={defaultValue}
         placeholder={placeholder}
+        maxLength={maxLength}
         className="w-full px-5 py-4 bg-[#f8fafc] border border-gray-100 rounded-2xl text-gray-900 font-bold focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none resize-none placeholder-gray-300"
       />
     </div>

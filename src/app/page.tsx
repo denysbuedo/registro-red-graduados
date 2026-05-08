@@ -23,6 +23,11 @@ export default async function Home() {
     redirect("/pendiente");
   }
 
+  // Si el usuario es de una institución, redirigir directo a sus solicitudes
+  if (session?.role === "institution") {
+    redirect("/universidad");
+  }
+
   // Check and send event notifications
   if (session?.status === "approved" && APP_CONFIG.features.events) {
     await checkAndSendEventNotifications();

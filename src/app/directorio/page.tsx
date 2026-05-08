@@ -39,6 +39,10 @@ export default async function DirectorioPage({
   const yearFrom = params.yearFrom || "";
   const yearTo = params.yearTo || "";
 
+  const PAGE_SIZE = 25;
+  const page = parseInt(params.page || "1");
+  const offset = (page - 1) * PAGE_SIZE;
+
   let queryBuilder = db
     .select({
       id: graduates.id,
@@ -70,13 +74,7 @@ export default async function DirectorioPage({
   }
 
   if (search) {
-    conditions.push(
-      or(
-        like(graduates.name, `%${search}%`),
-        like(graduates.currentProfession, `%${search}%`),
-        like(graduates.bio, `%${search}%`)
-      )
-    );
+    conditions.push(like(graduates.name, `%${search}%`));
   }
   
   if (country) conditions.push(eq(graduates.country, country));
@@ -85,10 +83,11 @@ export default async function DirectorioPage({
   }
   if (career) conditions.push(eq(graduates.career, career));
   
-  if (yearFrom) {
+  const currentYear = new Date().getFullYear();
+  if (yearFrom && parseInt(yearFrom) > 1900) {
     conditions.push(sql`${graduates.graduationYear} >= ${parseInt(yearFrom)}`);
   }
-  if (yearTo) {
+  if (yearTo && parseInt(yearTo) > 0 && parseInt(yearTo) <= currentYear + 10) {
     conditions.push(sql`${graduates.graduationYear} <= ${parseInt(yearTo)}`);
   }
 
@@ -96,7 +95,20 @@ export default async function DirectorioPage({
     queryBuilder = queryBuilder.where(and(...conditions));
   }
 
-  const allGraduates = await queryBuilder.orderBy(desc(graduates.createdAt));
+  // Clonar para contar el total antes de paginar
+  const totalResultsQuery = db
+    .select({ count: sql<number>`count(*)` })
+    .from(graduates)
+    .innerJoin(users, eq(graduates.userId, users.id))
+    .where(and(eq(users.status, "approved"), ...conditions));
+  
+  const totalResults = (await totalResultsQuery)[0].count;
+  const totalPages = Math.ceil(totalResults / PAGE_SIZE);
+
+  const allGraduates = await queryBuilder
+    .orderBy(desc(graduates.createdAt))
+    .limit(PAGE_SIZE)
+    .offset(offset);
 
   const countriesResult = await db
     .selectDistinct({ country: graduates.country })
@@ -173,7 +185,7 @@ export default async function DirectorioPage({
                   type="text"
                   name="search"
                   defaultValue={search}
-                  placeholder="Buscar por nombre, cargo o palabras clave..."
+                  placeholder="Buscar por nombre del egresado..."
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-semibold placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none"
                 />
                 <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,14 +211,18 @@ export default async function DirectorioPage({
                   type="number"
                   name="yearFrom"
                   defaultValue={yearFrom}
-                  placeholder="Año inicial"
+                  placeholder="Año inicial (ej. 1990)"
+                  min="1960"
+                  max={currentYear + 10}
                   className="w-1/2 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-900 font-bold text-xs focus:bg-white focus:border-blue-400 transition-all outline-none"
                 />
                 <input
                   type="number"
                   name="yearTo"
                   defaultValue={yearTo}
-                  placeholder="Año final"
+                  placeholder="Año final (ej. 2024)"
+                  min="1960"
+                  max={currentYear + 10}
                   className="w-1/2 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-900 font-bold text-xs focus:bg-white focus:border-blue-400 transition-all outline-none"
                 />
               </div>
@@ -215,7 +231,7 @@ export default async function DirectorioPage({
             {(search || country || university || career || yearFrom || yearTo) && (
               <div className="flex items-center justify-between pt-4 border-t border-gray-50">
                 <p className="text-sm text-gray-500 font-bold">
-                  Mostrando <span className="text-[#003f8f]">{allGraduates.length}</span> egresados encontrados
+                  Mostrando <span className="text-[#003f8f]">{offset + 1}-{Math.min(offset + allGraduates.length, totalResults)}</span> de <span className="text-[#003f8f]">{totalResults}</span> egresados
                 </p>
                 <Link
                   href="/directorio"
@@ -231,22 +247,55 @@ export default async function DirectorioPage({
         {/* Results Grid */}
         <div className="mt-12">
           {allGraduates.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {allGraduates.map((g) => (
-                <GraduateCard
-                  key={g.id}
-                  id={g.id}
-                  name={g.name}
-                  country={g.country}
-                  university={g.university}
-                  career={g.career}
-                  graduationYear={g.graduationYear}
-                  currentProfession={g.currentProfession}
-                  currentCompany={g.currentCompany}
-                  photoUrl={g.photoUrl}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {allGraduates.map((g) => (
+                  <GraduateCard
+                    key={g.id}
+                    id={g.id}
+                    name={g.name}
+                    country={g.country}
+                    university={g.university}
+                    career={g.career}
+                    graduationYear={g.graduationYear}
+                    currentProfession={g.currentProfession}
+                    currentCompany={g.currentCompany}
+                    photoUrl={g.photoUrl}
+                  />
+                ))}
+              </div>
+
+              {/* Controles de Paginación */}
+              {totalPages > 1 && (
+                <div className="mt-16 flex justify-center items-center gap-6">
+                  {page > 1 ? (
+                    <Link
+                      href={`/directorio?${new URLSearchParams({ ...Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined)), page: (page - 1).toString() })}`}
+                      className="px-8 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                      Anterior
+                    </Link>
+                  ) : (
+                    <div className="px-8 py-3 bg-gray-50 text-gray-300 rounded-2xl font-bold border border-gray-100 cursor-not-allowed">Anterior</div>
+                  )}
+
+                  <span className="text-sm font-bold text-gray-400 bg-gray-100 px-4 py-2 rounded-lg">Página {page} de {totalPages}</span>
+
+                  {page < totalPages ? (
+                    <Link
+                      href={`/directorio?${new URLSearchParams({ ...Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined)), page: (page + 1).toString() })}`}
+                      className="px-8 py-3 bg-[#003f8f] text-white rounded-2xl font-bold hover:bg-[#002e6a] transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
+                    >
+                      Siguiente
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </Link>
+                  ) : (
+                    <div className="px-8 py-3 bg-gray-50 text-gray-300 rounded-2xl font-bold border border-gray-100 cursor-not-allowed">Siguiente</div>
+                  )}
+                </div>
+              )}
+            </>
           ) : (
             <div className="bg-white rounded-[3rem] p-20 text-center border border-gray-100 shadow-xl shadow-slate-200/50">
               <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">

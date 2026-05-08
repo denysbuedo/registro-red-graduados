@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Maestro de Pruebas QA - Red de Egresados</title>
+    <style>
+        :root { --primary: #003f8f; --secondary: #0052bd; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; color: var(--text); background: var(--bg); margin: 0; padding: 40px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 50px; border-radius: 30px; shadow: 0 10px 50px rgba(0,0,0,0.05); }
+        header { text-align: center; border-bottom: 2px solid #edf2f7; padding-bottom: 30px; margin-bottom: 40px; }
+        h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 5px; }
+        .role-section { margin-top: 50px; }
+        h2 { background: var(--primary); color: white; padding: 12px 25px; border-radius: 12px; font-size: 1.3em; display: inline-block; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 0.95em; }
+        th { background: #f1f5f9; color: var(--primary); text-align: left; padding: 15px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .func { font-weight: bold; color: var(--primary); width: 25%; }
+        .steps { width: 40%; }
+        .result { width: 35%; color: #475569; }
+        .badge { font-size: 0.75em; padding: 4px 10px; border-radius: 6px; font-weight: bold; bg: #e2e8f0; }
+        @media print { body { padding: 0; background: white; } .container { shadow: none; border: none; width: 100%; max-width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Protocolo Maestro de Validación (QA)</h1>
+            <p><strong>Sistema de Registro y Red de Egresados Internacionales</strong></p>
+            <p style="color: #64748b;">Versión 1.0.4 | Mayo 2026</p>
+        </header>
+
+        <!-- ROL PÚBLICO -->
+        <div class="role-section">
+            <h2>1. Perfil: Usuario Público / Visitante</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionalidad</th>
+                        <th>Pasos de Prueba</th>
+                        <th>Resultado Esperado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="func">Registro Integral</td>
+                        <td>Completar todos los pasos: Datos personales, Universidad, Carrera y Foto.</td>
+                        <td>Registro exitoso. El sistema debe crear el usuario con estado "Pendiente".</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Seguridad de Acceso</td>
+                        <td>Intentar acceder a <code>/directorio</code> o <code>/admin</code> sin login.</td>
+                        <td>Redirección forzosa a <code>/login</code>.</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Validación de Campos</td>
+                        <td>Intentar registrarse con un correo ya existente.</td>
+                        <td>Mensaje de error: "El correo ya está registrado".</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ROL GRADUADO -->
+        <div class="role-section">
+            <h2>2. Perfil: Graduado Aprobado</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionalidad</th>
+                        <th>Pasos de Prueba</th>
+                        <th>Resultado Esperado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="func">Directorio Global</td>
+                        <td>Filtrar por País, Universidad y Año de Graduación.</td>
+                        <td>Los resultados deben ser precisos y el diseño de las tarjetas fluido.</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Gestión de Perfil</td>
+                        <td>Cambiar Bio, Empresa actual y links de LinkedIn.</td>
+                        <td>Persistencia inmediata en la base de datos.</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Red de Conexiones</td>
+                        <td>Enviar solicitud a otro graduado y aceptar una recibida.</td>
+                        <td>Cambio de estado a "Conectado". Acceso mutuo a perfiles privados.</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Muro de Comunidad</td>
+                        <td>Publicar un post, dar Like y comentar en otro post.</td>
+                        <td>Interacción en tiempo real. Los comentarios deben mostrar autor y fecha.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ROL INSTITUCIÓN -->
+        <div class="role-section">
+            <h2>3. Perfil: Gestor Institucional (Universidad)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionalidad</th>
+                        <th>Pasos de Prueba</th>
+                        <th>Resultado Esperado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="func">Aprobación Local</td>
+                        <td>Aprobar a un graduado de SU universidad.</td>
+                        <td>El usuario pasa de "Pendiente" a "Aprobado" solo en su jurisdicción.</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Auditoría Institucional</td>
+                        <td>Ver lista de todos los egresados de la universidad.</td>
+                        <td>No debe visualizar graduados de otras universidades.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ROL DRI -->
+        <div class="role-section">
+            <h2>4. Perfil: Gestor Ministerial (DRI)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionalidad</th>
+                        <th>Pasos de Prueba</th>
+                        <th>Resultado Esperado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="func">Visión Sectorial</td>
+                        <td>Acceder al panel DRI asignado a un ministerio (ej. MINSAP).</td>
+                        <td>Debe ver estadísticas y usuarios de TODAS las universidades de ese ministerio.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ROL ADMIN -->
+        <div class="role-section">
+            <h2>5. Perfil: Súper Administrador (DINFO)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionalidad</th>
+                        <th>Pasos de Prueba</th>
+                        <th>Resultado Esperado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="func">Control Total</td>
+                        <td>Gestionar usuarios de cualquier universidad o ministerio.</td>
+                        <td>Acceso irrestricto a edición y borrado (si aplica).</td>
+                    </tr>
+                    <tr>
+                        <td class="func">Estadísticas Nacionales</td>
+                        <td>Ver contador global de egresados y países en el Home.</td>
+                        <td>Cálculo dinámico basado en el total de la base de datos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; color: #94a3b8; font-size: 0.8em; border-top: 1px solid #eee; padding-top: 20px;">
+            Este protocolo asegura que la experiencia multi-tenant y las funciones sociales operen bajo los estándares del MES.
+        </div>
+    </div>
+</body>
+</html>

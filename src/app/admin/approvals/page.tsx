@@ -20,6 +20,14 @@ export default function ApprovalsPage() {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     fetchPendingUsers();
@@ -60,7 +68,10 @@ export default function ApprovalsPage() {
       if (response.ok) {
         setRejectReason("");
         setSelectedUser(null);
+        setToast({ message: action === "approve" ? "¡Usuario aprobado con éxito!" : "Usuario rechazado", type: "success" });
         fetchPendingUsers();
+      } else {
+        setToast({ message: "Error al procesar la solicitud", type: "error" });
       }
     } catch (error) {
       console.error("Error updating user:", error);
@@ -100,7 +111,15 @@ export default function ApprovalsPage() {
                   <td className="px-6 py-4">
                     <div className="font-medium text-gray-900">{user.username}</div>
                     {user.graduateName && (
-                      <div className="text-sm text-gray-500">{user.graduateName}</div>
+                      <a 
+                        href={`/egresados/${user.graduateId}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#003f8f] font-bold hover:underline flex items-center gap-1"
+                      >
+                        {user.graduateName}
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      </a>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>

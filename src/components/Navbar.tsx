@@ -155,7 +155,9 @@ export function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            <NavLink href="/">Inicio</NavLink>
+            {(!user || user.role !== "institution") && (
+              <NavLink href="/">Inicio</NavLink>
+            )}
             {user && (user.role === "admin" || user.role === "institution" || user.role === "dri") && (
               <NavLink href="/directorio">Directorio</NavLink>
             )}
@@ -373,9 +375,11 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden pb-4 border-t border-gray-200 pt-2">
             <div className="flex flex-col gap-1">
-              <MobileNavLink href="/" onClick={() => setIsOpen(false)}>
-                Inicio
-              </MobileNavLink>
+              {(!user || user.role !== "institution") && (
+                <MobileNavLink href="/" onClick={() => setIsOpen(false)}>
+                  Inicio
+                </MobileNavLink>
+              )}
               {user && (user.role === "admin" || user.role === "institution" || user.role === "dri") && (
                 <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>
               )}

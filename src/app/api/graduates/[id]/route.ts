@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { graduates, connections, posts } from "@/db/schema";
+import { graduates, connections, posts, graduatePostgraduates } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
@@ -11,12 +11,12 @@ export async function GET(
     const { id } = await params;
     const graduateId = parseInt(id);
 
-    const graduate = await db
-      .select()
-      .from(graduates)
-      .where(eq(graduates.id, graduateId));
+    const graduate = await db.query.graduates.findFirst({
+      where: eq(graduates.id, graduateId),
+      with: { postgraduates: true },
+    });
 
-    if (!graduate.length) {
+    if (!graduate) {
       return NextResponse.json(
         { error: "Egresado no encontrado" },
         { status: 404 }
@@ -50,7 +50,7 @@ export async function GET(
       .orderBy(posts.createdAt);
 
     return NextResponse.json({
-      ...graduate[0],
+      ...graduate,
       connectionsCount:
         graduateConnections.length + receivedConnections.length,
       postsCount: graduatePosts.length,
@@ -88,9 +88,6 @@ export async function PUT(
         career: body.career,
         graduationYear: body.graduationYear,
         pregradoModalidad: body.pregradoModalidad,
-        postgradoUniversity: body.postgradoUniversity,
-        postgradoProgram: body.postgradoProgram,
-        postgradoYear: body.postgradoYear,
         otherAcademicProgram: body.otherAcademicProgram,
         otherCubanInstitution: body.otherCubanInstitution,
         currentProfession: body.currentProfession,
@@ -113,6 +110,21 @@ export async function PUT(
         { error: "Egresado no encontrado" },
         { status: 404 }
       );
+    }
+
+    // Actualizar múltiples postgrados
+    if (body.postgraduates) {
+      await db.delete(graduatePostgraduates).where(eq(graduatePostgraduates.graduateId, graduateId));
+      if (Array.isArray(body.postgraduates) && body.postgraduates.length > 0) {
+        await db.insert(graduatePostgraduates).values(
+          body.postgraduates.map((pg: any) => ({
+            graduateId,
+            program: pg.program,
+            university: pg.university,
+            year: parseInt(pg.year),
+          }))
+        );
+      }
     }
 
     return NextResponse.json(updated[0]);
