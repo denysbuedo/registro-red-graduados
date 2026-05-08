@@ -134,8 +134,8 @@ export default async function Home() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Opción para Instituciones / DRI */}
-                {(session?.role === 'institution' || session?.role === 'dri' || session?.role === 'admin') && (
-                  <Link href={(session.role === 'dri' || session.role === 'admin') ? "/dri" : "/universidad"} className="group p-6 border-2 border-purple-50 bg-purple-50/50 rounded-2xl hover:border-purple-500 hover:bg-white transition-all">
+                {(session?.role === 'dri' || session?.role === 'admin') && (
+                  <Link href="/dri" className="group p-6 border-2 border-purple-50 bg-purple-50/50 rounded-2xl hover:border-purple-500 hover:bg-white transition-all">
                     <span className="text-3xl block mb-3">📋</span>
                     <h3 className="text-lg font-bold text-purple-900 group-hover:text-purple-600">Gestión de Solicitudes</h3>
                     <p className="text-sm text-purple-700 mt-1">Revisar y aprobar nuevos registros de egresados.</p>
@@ -237,13 +237,7 @@ export default async function Home() {
                         <p className="text-sm text-purple-700 mt-1">Gestionar usuarios y aprobaciones</p>
                       </Link>
                     )}
-                    {session?.role === 'institution' && (
-                       <Link href="/universidad" className="p-4 border border-yellow-100 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-colors">
-                        <span className="text-2xl block mb-2">🏛️</span>
-                        <span className="font-semibold text-yellow-700">Gestión Institucional</span>
-                        <p className="text-sm text-yellow-700 mt-1">Revisar solicitudes y egresados</p>
-                      </Link>
-                    )}
+
                   </div>
                 </div>
               ) : (
