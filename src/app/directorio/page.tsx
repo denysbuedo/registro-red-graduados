@@ -1,9 +1,14 @@
 import { db } from "@/db";
-import { graduates } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { graduates, users } from "@/db/schema";
+import { sql, eq, and, like, or, desc } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { GraduateCard } from "@/components/GraduateCard";
+import { APP_CONFIG } from "@/lib/config";
+
+import { getUniversitiesByMinistry, Ministry } from "@/lib/universities";
+import { inArray } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -12,16 +17,18 @@ export default async function DirectorioPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  // Verificar autenticación
   const session = await getSession();
 
   if (!session) {
     redirect("/login?redirect=/directorio");
   }
 
-  // Redirigir usuarios pendientes a la página de espera
   if (session.status === "pending") {
     redirect("/pendiente");
+  }
+
+  if (APP_CONFIG.isLightVersion && session.role === 'user') {
+    redirect("/");
   }
 
   const params = await searchParams;
@@ -32,199 +39,267 @@ export default async function DirectorioPage({
   const yearFrom = params.yearFrom || "";
   const yearTo = params.yearTo || "";
 
-  let query = db.select().from(graduates);
+  let queryBuilder = db
+    .select({
+      id: graduates.id,
+      name: graduates.name,
+      country: graduates.country,
+      university: graduates.university,
+      career: graduates.career,
+      graduationYear: graduates.graduationYear,
+      currentProfession: graduates.currentProfession,
+      currentCompany: graduates.currentCompany,
+      photoUrl: graduates.photoUrl,
+    })
+    .from(graduates)
+    .innerJoin(users, eq(graduates.userId, users.id))
+    .where(eq(users.status, "approved"))
+    .$dynamic();
+
   const conditions = [];
+
+  if (session.role === "institution" && session.institutionName) {
+    conditions.push(eq(graduates.university, session.institutionName));
+  }
+
+  if (session.role === "dri" && session.ministry) {
+    const unis = getUniversitiesByMinistry(session.ministry as Ministry);
+    if (unis.length > 0) {
+      conditions.push(inArray(graduates.university, unis));
+    }
+  }
 
   if (search) {
     conditions.push(
-      sql`(${graduates.name} LIKE ${"%" + search + "%"} OR ${graduates.currentProfession} LIKE ${"%" + search + "%"} OR ${graduates.bio} LIKE ${"%" + search + "%"})`
+      or(
+        like(graduates.name, `%${search}%`),
+        like(graduates.currentProfession, `%${search}%`),
+        like(graduates.bio, `%${search}%`)
+      )
     );
   }
-  if (country) conditions.push(sql`${graduates.country} = ${country}`);
-  if (university)
-    conditions.push(sql`${graduates.university} = ${university}`);
-  if (career) conditions.push(sql`${graduates.career} = ${career}`);
-  if (yearFrom)
-    conditions.push(
-      sql`${graduates.graduationYear} >= ${parseInt(yearFrom)}`
-    );
-  if (yearTo)
-    conditions.push(
-      sql`${graduates.graduationYear} <= ${parseInt(yearTo)}`
-    );
+  
+  if (country) conditions.push(eq(graduates.country, country));
+  if (university && session.role !== "institution") {
+    conditions.push(eq(graduates.university, university));
+  }
+  if (career) conditions.push(eq(graduates.career, career));
+  
+  if (yearFrom) {
+    conditions.push(sql`${graduates.graduationYear} >= ${parseInt(yearFrom)}`);
+  }
+  if (yearTo) {
+    conditions.push(sql`${graduates.graduationYear} <= ${parseInt(yearTo)}`);
+  }
 
-  const allGraduates =
-    conditions.length > 0
-      ? await query.where(sql.join(conditions, sql` AND `)).orderBy(graduates.name)
-      : await query.orderBy(graduates.name);
+  if (conditions.length > 0) {
+    queryBuilder = queryBuilder.where(and(...conditions));
+  }
+
+  const allGraduates = await queryBuilder.orderBy(desc(graduates.createdAt));
 
   const countriesResult = await db
     .selectDistinct({ country: graduates.country })
     .from(graduates)
+    .innerJoin(users, eq(graduates.userId, users.id))
+    .where(and(
+      eq(users.status, "approved"),
+      session.role === "dri" && session.ministry 
+        ? inArray(graduates.university, getUniversitiesByMinistry(session.ministry as Ministry))
+        : sql`1=1`
+    ))
     .orderBy(graduates.country);
 
   const universitiesResult = await db
     .selectDistinct({ university: graduates.university })
     .from(graduates)
+    .innerJoin(users, eq(graduates.userId, users.id))
+    .where(and(
+      eq(users.status, "approved"),
+      session.role === "dri" && session.ministry 
+        ? inArray(graduates.university, getUniversitiesByMinistry(session.ministry as Ministry))
+        : sql`1=1`
+    ))
     .orderBy(graduates.university);
 
   const careersResult = await db
     .selectDistinct({ career: graduates.career })
     .from(graduates)
+    .innerJoin(users, eq(graduates.userId, users.id))
+    .where(and(
+      eq(users.status, "approved"),
+      session.role === "dri" && session.ministry 
+        ? inArray(graduates.university, getUniversitiesByMinistry(session.ministry as Ministry))
+        : sql`1=1`
+    ))
     .orderBy(graduates.career);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Directorio</h1>
-          <p className="text-gray-600 mt-1">
-            Busca y filtra egresados por diferentes criterios
-          </p>
+    <main className="min-h-screen bg-[#f8fafc] pb-24">
+      {/* Hero Header */}
+      <div className="bg-[#003f8f] relative overflow-hidden pt-16 pb-24">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_50%,rgba(255,255,255,0.4),transparent_50%)]"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <div>
+              <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
+                {session.role === "institution" ? `Graduados de ${session.institutionName}` : "Directorio Global"}
+              </h1>
+              <p className="text-blue-100 text-lg font-medium max-w-2xl">
+                Conecta con profesionales graduados en Cuba que hoy transforman el mundo. 
+                Explora por país, universidad o especialidad.
+              </p>
+            </div>
+            <div className="hidden lg:block">
+              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10">
+                <p className="text-white text-3xl font-black">{allGraduates.length}</p>
+                <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Egresados Registrados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="max-w-7xl mx-auto px-4 -mt-12 relative z-20">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-gray-100 p-6 sm:p-8">
+          <form className="space-y-6">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  name="search"
+                  defaultValue={search}
+                  placeholder="Buscar por nombre, cargo o palabras clave..."
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-bold placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none"
+                />
+                <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <button
+                type="submit"
+                className="px-10 py-4 bg-[#003f8f] hover:bg-[#002e6a] text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-blue-900/20 active:scale-95"
+              >
+                Filtrar Resultados
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <SelectFilter icon={<GlobeIcon />} name="country" defaultValue={country} options={countriesResult.map(c => c.country)} label="País de Residencia" />
+              {session.role !== "institution" && (
+                <SelectFilter icon={<UniversityIcon />} name="university" defaultValue={university} options={universitiesResult.map(u => u.university)} label="Universidad Cubana" />
+              )}
+              <SelectFilter icon={<AcademicIcon />} name="career" defaultValue={career} options={careersResult.map(c => c.career)} label="Especialidad / Carrera" />
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  name="yearFrom"
+                  defaultValue={yearFrom}
+                  placeholder="Año inicial"
+                  className="w-1/2 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-900 font-bold text-xs focus:bg-white focus:border-blue-400 transition-all outline-none"
+                />
+                <input
+                  type="number"
+                  name="yearTo"
+                  defaultValue={yearTo}
+                  placeholder="Año final"
+                  className="w-1/2 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-900 font-bold text-xs focus:bg-white focus:border-blue-400 transition-all outline-none"
+                />
+              </div>
+            </div>
+
+            {(search || country || university || career || yearFrom || yearTo) && (
+              <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                <p className="text-sm text-gray-500 font-bold">
+                  Mostrando <span className="text-[#003f8f]">{allGraduates.length}</span> egresados encontrados
+                </p>
+                <Link
+                  href="/directorio"
+                  className="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors"
+                >
+                  Limpiar todos los filtros
+                </Link>
+              </div>
+            )}
+          </form>
         </div>
 
-        <form className="mb-8 space-y-4">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              name="search"
-              defaultValue={search}
-              placeholder="Buscar por nombre, profesión o biografía..."
-              className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition-all"
-            />
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition-colors"
-            >
-              Buscar
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <select
-              name="country"
-              defaultValue={country}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            >
-              <option value="">Todos los países</option>
-              {countriesResult.map((c) => (
-                <option key={c.country} value={c.country}>
-                  {c.country}
-                </option>
+        {/* Results Grid */}
+        <div className="mt-12">
+          {allGraduates.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {allGraduates.map((g) => (
+                <GraduateCard
+                  key={g.id}
+                  id={g.id}
+                  name={g.name}
+                  country={g.country}
+                  university={g.university}
+                  career={g.career}
+                  graduationYear={g.graduationYear}
+                  currentProfession={g.currentProfession}
+                  currentCompany={g.currentCompany}
+                  photoUrl={g.photoUrl}
+                />
               ))}
-            </select>
-
-            <select
-              name="university"
-              defaultValue={university}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            >
-              <option value="">Todas las universidades</option>
-              {universitiesResult.map((u) => (
-                <option key={u.university} value={u.university}>
-                  {u.university}
-                </option>
-              ))}
-            </select>
-
-            <select
-              name="career"
-              defaultValue={career}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            >
-              <option value="">Todas las carreras</option>
-              {careersResult.map((c) => (
-                <option key={c.career} value={c.career}>
-                  {c.career}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="number"
-              name="yearFrom"
-              defaultValue={yearFrom}
-              placeholder="Año desde"
-              min={1960}
-              max={2030}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            />
-
-            <input
-              type="number"
-              name="yearTo"
-              defaultValue={yearTo}
-              placeholder="Año hasta"
-              min={1960}
-              max={2030}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            />
-          </div>
-
-          {(search || country || university || career || yearFrom || yearTo) && (
-            <div className="flex items-center gap-2">
-              <span className="text-gray-600 text-sm">
-                {allGraduates.length} resultado{allGraduates.length !== 1 && "s"}
-              </span>
-              <a
+            </div>
+          ) : (
+            <div className="bg-white rounded-[3rem] p-20 text-center border border-gray-100 shadow-xl shadow-slate-200/50">
+              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">Sin coincidencias</h3>
+              <p className="text-gray-500 font-medium mb-8 max-w-md mx-auto">
+                No hemos encontrado egresados con esos criterios. Prueba ampliando tu búsqueda o eliminando algunos filtros.
+              </p>
+              <Link
                 href="/directorio"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="inline-flex px-8 py-4 bg-[#003f8f] text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-blue-900/20 active:scale-95"
               >
-                Limpiar filtros
-              </a>
+                Reiniciar Directorio
+              </Link>
             </div>
           )}
-        </form>
-
-        {allGraduates.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {allGraduates.map((g) => (
-              <GraduateCard
-                key={g.id}
-                id={g.id}
-                name={g.name}
-                country={g.country}
-                university={g.university}
-                career={g.career}
-                graduationYear={g.graduationYear}
-                currentProfession={g.currentProfession}
-                currentCompany={g.currentCompany}
-                photoUrl={g.photoUrl}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-xl p-16 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No se encontraron resultados
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Intenta ajustar los filtros de búsqueda
-            </p>
-            <a
-              href="/directorio"
-              className="inline-block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
-            >
-              Ver todos los egresados
-            </a>
-          </div>
-        )}
+        </div>
       </div>
     </main>
   );
+}
+
+function SelectFilter({ icon, name, defaultValue, options, label }: any) {
+  return (
+    <div className="relative">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+        {icon}
+      </div>
+      <select
+        name={name}
+        defaultValue={defaultValue}
+        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-900 font-bold text-xs focus:bg-white focus:border-blue-400 transition-all outline-none appearance-none cursor-pointer"
+      >
+        <option value="">{label}</option>
+        {options.map((opt: string) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function GlobeIcon() {
+  return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>;
+}
+
+function UniversityIcon() {
+  return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>;
+}
+
+function AcademicIcon() {
+  return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
 }

@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { CreateUserModal } from "@/components/CreateUserModal"; // Add this import
+import { NotificationModal } from "@/components/NotificationModal"; // NEW IMPORT
 
 interface User {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "institution" | "editor" | "dri";
   createdAt: Date | null;
   graduateId: number | null;
   graduateName: string | null;
   graduateCountry: string | null;
+  institutionName: string | null; // Nuevo campo
+  ministry: string | null; // Nuevo campo
 }
 
 export default function AdminUsersPage() {
@@ -19,11 +23,23 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterRole, setFilterRole] = useState<"all" | "user" | "admin">("all");
+  const [filterRole, setFilterRole] = useState<"all" | "user" | "admin" | "institution" | "editor" | "dri">("all");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false); // Nuevo estado para el modal
+  const [showNotification, setShowNotification] = useState(false); // NEW state for notification modal
+  const [notificationMessage, setNotificationMessage] = useState({ message: "", type: "info" as "info" | "success" | "error" }); // NEW state for notification message
 
   useEffect(() => {
+    // Verificar rol adicional de seguridad para DRI
+    fetch("/api/auth/me")
+      .then(res => res.json())
+      .then(data => {
+        if (data.user?.role !== "admin") {
+          router.push("/admin");
+        }
+      });
+
     fetchUsers();
   }, [search, filterRole]);
 
@@ -46,7 +62,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleUpdateRole = async (userId: number, newRole: "user" | "admin") => {
+  const handleUpdateRole = async (userId: number, newRole: "user" | "admin" | "institution" | "editor" | "dri") => {
     try {
       const response = await fetch("/api/admin/users", {
         method: "PUT",
@@ -69,12 +85,19 @@ export default function AdminUsersPage() {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        fetchUsers();
-        setShowDeleteConfirm(null);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al eliminar usuario");
       }
+
+      fetchUsers();
+      setShowDeleteConfirm(null);
+      setNotificationMessage({ message: "Usuario eliminado exitosamente", type: "success" });
+      setShowNotification(true);
     } catch (error) {
       console.error("Error deleting user:", error);
+      setNotificationMessage({ message: (error as Error).message, type: "error" });
+      setShowNotification(true);
     }
   };
 
@@ -86,6 +109,12 @@ export default function AdminUsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
           <p className="text-gray-500 mt-1">Administra las cuentas de usuario de la red</p>
         </div>
+        <button
+          onClick={() => setShowCreateUserModal(true)}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          + Crear Nuevo Usuario
+        </button>
       </div>
 
       {/* Filters */}
@@ -108,6 +137,9 @@ export default function AdminUsersPage() {
             <option value="all">Todos los roles</option>
             <option value="user">Usuarios</option>
             <option value="admin">Administradores</option>
+            <option value="institution">Instituciones</option>
+            <option value="editor">Editores</option>
+            <option value="dri">DRI</option>
           </select>
         </div>
       </div>
@@ -182,7 +214,7 @@ export default function AdminUsersPage() {
                         <select
                           value={user.role}
                           onChange={(e) =>
-                            handleUpdateRole(user.id, e.target.value as "user" | "admin")
+                            handleUpdateRole(user.id, e.target.value as "user" | "admin" | "institution" | "editor" | "dri")
                           }
                           onBlur={() => setEditingUser(null)}
                           autoFocus
@@ -190,18 +222,38 @@ export default function AdminUsersPage() {
                         >
                           <option value="user">Usuario</option>
                           <option value="admin">Administrador</option>
+                          <option value="institution">Institución</option>
+                          <option value="editor">Editor</option>
+                          <option value="dri">DRI</option>
                         </select>
                       ) : (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${
-                            user.role === "admin"
-                              ? "bg-purple-100 text-purple-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                          onClick={() => setEditingUser(user)}
-                        >
-                          {user.role === "admin" ? "Admin" : "Usuario"}
-                        </span>
+                        <>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${
+                              user.role === "admin"
+                                ? "bg-purple-100 text-purple-800"
+                                : user.role === "institution"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : user.role === "editor"
+                                ? "bg-green-100 text-green-800"
+                                : user.role === "dri"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                            onClick={() => setEditingUser(user)}
+                          >
+                            {user.role === "admin" ? "Admin"
+                              : user.role === "institution" ? "Institución"
+                              : user.role === "editor" ? "Editor"
+                              : user.role === "dri" ? "DRI"
+                              : "Usuario"}
+                          </span>
+                          {user.role === "dri" && user.ministry && (
+                            <p className="text-[10px] text-blue-600 font-bold mt-1 uppercase tracking-tighter">
+                              {user.ministry}
+                            </p>
+                          )}
+                        </>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -267,6 +319,26 @@ export default function AdminUsersPage() {
           <span className="font-semibold">💡 Consejo:</span> Haz clic en el rol de un usuario para cambiarlo entre Usuario y Administrador.
         </p>
       </div>
+
+      {showCreateUserModal && (
+        <CreateUserModal
+          onClose={() => setShowCreateUserModal(false)}
+          onUserCreated={() => {
+            setShowCreateUserModal(false);
+            fetchUsers();
+            setNotificationMessage({ message: "Usuario creado exitosamente", type: "success" });
+            setShowNotification(true);
+          }}
+        />
+      )}
+
+      {showNotification && (
+        <NotificationModal
+          message={notificationMessage.message}
+          type={notificationMessage.type}
+          onClose={() => setShowNotification(false)}
+        />
+      )}
     </div>
   );
 }

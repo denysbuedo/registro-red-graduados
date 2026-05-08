@@ -26,15 +26,18 @@ export interface SessionUser {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin" | "institution" | "editor";
+  role: "user" | "admin" | "institution" | "editor" | "dri";
   status: string;
   pendingUniversity?: string | null;
   institutionName?: string | null;
+  ministry?: string | null;
   graduateId?: number | null;
 }
 
 interface SessionData {
   userId: number;
+  role: string;
+  status: string;
   createdAt: number; // timestamp en ms
 }
 
@@ -69,6 +72,7 @@ export async function getSession(): Promise<SessionUser | null> {
         status: users.status,
         pendingUniversity: users.pendingUniversity,
         institutionName: users.institutionName,
+        ministry: users.ministry,
         graduateId: users.graduateId,
       })
       .from(users)
@@ -87,7 +91,14 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function setSession(user: SessionUser): Promise<void> {
   const cookieStore = await cookies();
-  const token = btoa(JSON.stringify({ userId: user.id, createdAt: Date.now() }));
+  const token = btoa(
+    JSON.stringify({
+      userId: user.id,
+      role: user.role,
+      status: user.status,
+      createdAt: Date.now(),
+    })
+  );
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,

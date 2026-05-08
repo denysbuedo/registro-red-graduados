@@ -20,6 +20,7 @@ export async function GET() {
       role: user.role,
       status: user.status,
       pendingUniversity: user.pendingUniversity,
+      ministry: user.ministry,
       graduateId: user.graduateId,
     },
     graduate,

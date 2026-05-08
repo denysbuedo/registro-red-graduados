@@ -4,6 +4,7 @@ import { users } from "@/db/schema";
 import { verifyPassword } from "@/lib/auth";
 import { setSession } from "@/lib/session";
 import { eq } from "drizzle-orm";
+import { APP_CONFIG } from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +34,14 @@ export async function POST(request: NextRequest) {
     }
 
     const user = userResult[0];
+
+    // Si es versión Light, solo permitir ciertos roles
+    if (APP_CONFIG.isLightVersion && !APP_CONFIG.allowedLightRoles.includes(user.role)) {
+      return NextResponse.json(
+        { error: "Esta plataforma está restringida a administradores e instituciones." },
+        { status: 403 }
+      );
+    }
 
     // Verificar contraseña
     const isValidPassword = await verifyPassword(password, user.passwordHash);
@@ -64,6 +73,7 @@ export async function POST(request: NextRequest) {
         role: user.role as any,
         status: user.status,
         pendingUniversity: user.pendingUniversity,
+        ministry: user.ministry,
         graduateId: user.graduateId,
       });
 
@@ -79,9 +89,10 @@ export async function POST(request: NextRequest) {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role as "user" | "admin" | "institution" | "editor",
+      role: user.role as any,
       status: user.status,
       pendingUniversity: user.pendingUniversity,
+      ministry: user.ministry,
       graduateId: user.graduateId,
     });
 

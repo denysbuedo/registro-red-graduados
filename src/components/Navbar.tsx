@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { APP_CONFIG } from "@/lib/config";
 
 interface User {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin" | "institution" | "editor";
+  role: "user" | "admin" | "institution" | "editor" | "dri";
   status: string;
   graduateId: number | null;
   institutionName: string | null;
@@ -55,8 +56,9 @@ export function Navbar() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        // Redirigir usuarios pendientes
-        if (data.user?.status === "pending") {
+        
+        // Redirigir usuarios pendientes SOLO si no están ya en la página de espera
+        if (data.user?.status === "pending" && window.location.pathname !== "/pendiente") {
           window.location.href = "/pendiente";
         }
       }
@@ -137,28 +139,35 @@ export function Navbar() {
     }
   };
 
+  // Si no hay usuario o está pendiente, no mostramos la Navbar
+  if (!user || user.status === "pending") {
+    return null;
+  }
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
             <span className="text-[#003f8f] font-bold text-xl hidden sm:block">
-              Red Egresados Internacionales
+              Red Graduados Internacionales
             </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
             <NavLink href="/">Inicio</NavLink>
-            {user && <NavLink href="/directorio">Directorio</NavLink>}
-            {user && user.role === "institution" && (
-              <NavLink href="/universidad">
-                <span className="flex items-center gap-1">🏛️ Mi Universidad</span>
+            {user && (user.role === "admin" || user.role === "institution" || user.role === "dri") && (
+              <NavLink href="/directorio">Directorio</NavLink>
+            )}
+            {user && (user.role === "institution" || user.role === "dri" || user.role === "admin") && (
+              <NavLink href={(user.role === "dri" || user.role === "admin") ? "/dri" : "/universidad"}>
+                <span className="flex items-center gap-1">📋 Solicitudes</span>
               </NavLink>
             )}
-            {user && <NavLink href="/eventos">Eventos</NavLink>}
-            {user && <NavLink href="/noticias">Noticias</NavLink>}
-            {user && <NavLink href="/comunidades">Comunidades</NavLink>}
-            {user && (
+            {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.events && <NavLink href="/eventos">Eventos</NavLink>}
+            {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.socialFeed && <NavLink href="/noticias">Noticias</NavLink>}
+            {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.groups && <NavLink href="/comunidades">Comunidades</NavLink>}
+            {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.connections && (
               <NavLink href="/conexiones">
                 <div className="flex items-center gap-1.5">
                   <span>Conexiones</span>
@@ -171,7 +180,7 @@ export function Navbar() {
               </NavLink>
             )}
 
-            {user && (
+            {user && APP_CONFIG.features.notifications && (
               <div className="relative">
                 <button
                   onClick={() => setNotifOpen(!notifOpen)}
@@ -296,7 +305,7 @@ export function Navbar() {
                         🛡️ Panel Admin
                       </Link>
                     )}
-                    {user.graduateId && (
+                    {user.graduateId && APP_CONFIG.features.individualProfiles && (
                       <Link
                         href={`/egresados/${user.graduateId}`}
                         className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm transition-colors"
@@ -367,14 +376,17 @@ export function Navbar() {
               <MobileNavLink href="/" onClick={() => setIsOpen(false)}>
                 Inicio
               </MobileNavLink>
-              {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>}
-              {user && <MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>🤝 Conexiones</MobileNavLink>}
-              {user && user.role === "institution" && (
-                <MobileNavLink href="/universidad" onClick={() => setIsOpen(false)}>🏛️ Mi Universidad</MobileNavLink>
+              {user && (user.role === "admin" || user.role === "institution" || user.role === "dri") && (
+                <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>
               )}
-              {user && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
-              {user && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
-              {user && <MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink>}
+              {user && (user.role === "institution" || user.role === "dri") && (
+                <MobileNavLink href={user.role === "dri" ? "/dri" : "/universidad"} onClick={() => setIsOpen(false)}>
+                  📋 Solicitudes
+                </MobileNavLink>
+              )}
+              {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.events && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
+              {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.socialFeed && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
+              {user && !APP_CONFIG.isLightVersion && APP_CONFIG.features.groups && <MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink>}
 
               {user ? (
                 <>
@@ -386,7 +398,7 @@ export function Navbar() {
                       🛡️ Panel Admin
                     </MobileNavLink>
                   )}
-                  {user.graduateId && (
+                  {user.graduateId && APP_CONFIG.features.individualProfiles && (
                     <MobileNavLink
                       href={`/egresados/${user.graduateId}`}
                       onClick={() => setIsOpen(false)}

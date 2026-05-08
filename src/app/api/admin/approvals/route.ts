@@ -8,7 +8,7 @@ import { eq, or, desc } from "drizzle-orm";
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
-    if (!session || (session.role !== "admin" && session.role !== "institution")) {
+    if (!session || (session.role !== "admin" && session.role !== "institution" && session.role !== "dri")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getSession();
-    if (!session || (session.role !== "admin" && session.role !== "institution")) {
+    if (!session || (session.role !== "admin" && session.role !== "institution" && session.role !== "dri")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 

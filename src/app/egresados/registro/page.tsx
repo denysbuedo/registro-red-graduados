@@ -15,24 +15,7 @@ const COUNTRIES = [
   "Australia", "Otro",
 ];
 
-const UNIVERSITIES = [
-  "Universidad de La Habana",
-  "Universidad de Oriente",
-  "Universidad Central de Las Villas",
-  "Universidad Marta Abreu de Las Villas",
-  "Universidad de Camagüey",
-  "Universidad de Pinar del Río",
-  "Universidad de Holguín",
-  "Universidad de Granma",
-  "Universidad de Sancti Spíritus",
-  "Universidad de Matanzas",
-  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
-  "Universidad de Ciencias Médicas de La Habana",
-  "Escuela Internacional de Educación Física y Deportes",
-  "Instituto Superior de Arte",
-  "Universidad de las Ciencias Informáticas",
-  "Otra",
-];
+import { UNIVERSITIES } from "@/lib/universities"; // Import the centralized list
 
 interface User {
   id: number;

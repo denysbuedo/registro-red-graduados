@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { APP_CONFIG } from "@/lib/config";
 
 interface GraduateCardProps {
   id: number;
@@ -42,7 +43,6 @@ export function GraduateCard({
       const response = await fetch(`/api/connections?check=${id}`);
       
       if (response.status === 401) {
-        // No está logueado
         setConnectionStatus("none");
         setChecking(false);
         return;
@@ -62,7 +62,9 @@ export function GraduateCard({
     }
   };
 
-  const handleConnect = async () => {
+  const handleConnect = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setLoading(true);
     try {
       const response = await fetch("/api/connections", {
@@ -76,7 +78,6 @@ export function GraduateCard({
       if (response.ok) {
         setConnectionStatus("pending-sent");
       } else {
-        // Mostrar error
         alert(data.error || "Error al enviar solicitud");
       }
     } catch (error) {
@@ -95,154 +96,112 @@ export function GraduateCard({
     .slice(0, 2);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">
-      <div className="flex items-start gap-4">
-        <Link href={`/egresados/${id}`}>
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
+    <Link 
+      href={APP_CONFIG.features.individualProfiles ? `/egresados/${id}` : "#"}
+      className="group relative bg-white border border-gray-100 rounded-[2rem] p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-1 overflow-hidden"
+    >
+      {/* Background Glow */}
+      <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+      
+      <div className="relative flex items-center gap-5">
+        {/* Avatar */}
+        <div className="relative shrink-0">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#003f8f] to-[#0052bd] flex items-center justify-center text-white font-black text-xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-500">
             {photoUrl ? (
               <img
                 src={photoUrl}
                 alt={name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             ) : (
               initials
             )}
           </div>
-        </Link>
-        <div className="min-w-0 flex-1">
-          <Link href={`/egresados/${id}`}>
-            <h3 className="text-gray-900 font-semibold text-base group-hover:text-blue-600 transition-colors truncate">
-              {name}
-            </h3>
-          </Link>
-          <p className="text-gray-500 text-sm truncate">
-            {currentProfession}
-            {currentCompany && ` en ${currentCompany}`}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md">
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              {country}
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded-md">
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 14l9-5-9-5-9 5 9 5z"
-                />
-              </svg>
-              {university}
-            </span>
-          </div>
+          {/* Status Indicator (Online/Verified etc - mock) */}
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-4 border-white rounded-full"></div>
+        </div>
 
-          {/* Botón de conectar */}
-          <div className="mt-3">
-            {checking ? (
-              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-400 text-sm rounded-lg">
-                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : connectionStatus === "none" || connectionStatus === "error" ? (
-              <button
-                onClick={handleConnect}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                  />
-                </svg>
-                {loading ? "Enviando..." : "Conectar"}
-              </button>
-            ) : connectionStatus === "pending-sent" ? (
-              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-yellow-50 text-yellow-700 text-sm font-medium rounded-lg border border-yellow-200">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Solicitud enviada
-              </div>
-            ) : connectionStatus === "pending-received" ? (
-              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-700 text-sm font-medium rounded-lg border border-purple-200">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                Te invitó a conectar
-              </div>
-            ) : connectionStatus === "connected" ? (
-              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Conectado
-              </div>
-            ) : null}
-          </div>
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-gray-900 font-extrabold text-lg tracking-tight group-hover:text-[#003f8f] transition-colors truncate mb-1">
+            {name}
+          </h3>
+          <p className="text-gray-500 font-medium text-sm truncate leading-tight">
+            {currentProfession}
+          </p>
+          {currentCompany && (
+            <p className="text-[#003f8f] text-xs font-bold truncate mt-1">
+              {currentCompany}
+            </p>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Meta Information Badges */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[11px] font-black uppercase tracking-wider border border-slate-100">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {country}
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/50 text-blue-700 rounded-xl text-[11px] font-black uppercase tracking-wider border border-blue-50">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+          </svg>
+          {university.split(" ").slice(0, 3).join(" ")}...
+        </span>
+      </div>
+
+      {/* Career Info */}
+      <div className="mt-4 pt-4 border-t border-gray-50">
+        <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter mb-1">Formación</p>
+        <p className="text-gray-700 text-sm font-bold truncate">
+          {career}
+        </p>
+        <p className="text-gray-400 text-[10px] font-black mt-0.5">PROMOCIÓN {graduationYear}</p>
+      </div>
+
+      {/* Connection Action */}
+      {APP_CONFIG.features.connections && (
+        <div className="mt-6">
+          {checking ? (
+            <div className="w-full h-11 bg-gray-50 rounded-2xl animate-pulse"></div>
+          ) : connectionStatus === "none" || connectionStatus === "error" ? (
+            <button
+              onClick={handleConnect}
+              disabled={loading}
+              className="w-full py-3 bg-[#003f8f] hover:bg-[#002e6a] text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-900/10 active:scale-95 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Conectar
+                </>
+              )}
+            </button>
+          ) : connectionStatus === "pending-sent" ? (
+            <div className="w-full py-3 bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-amber-100 flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3" />
+              </svg>
+              Pendiente
+            </div>
+          ) : connectionStatus === "connected" ? (
+            <div className="w-full py-3 bg-green-50 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-green-100 flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              Conectado
+            </div>
+          ) : null}
+        </div>
+      )}
+    </Link>
   );
 }

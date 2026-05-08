@@ -1,11 +1,14 @@
 import { db } from "@/db";
 import { users, graduates, adminPosts, connections } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { sql, desc } from "drizzle-orm";
 import Link from "next/link";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  const session = await getSession();
+
   // Obtener estadísticas
   const [
     totalUsers,
@@ -31,7 +34,7 @@ export default async function AdminDashboard() {
         hasGraduateProfile: sql<boolean>`EXISTS (SELECT 1 FROM graduates WHERE graduates.user_id = users.id)`,
       })
       .from(users)
-      .orderBy(sql`users.created_at DESC`)
+      .orderBy(desc(users.createdAt))
       .limit(5),
     db
       .select({
@@ -42,7 +45,7 @@ export default async function AdminDashboard() {
         createdAt: graduates.createdAt,
       })
       .from(graduates)
-      .orderBy(sql`graduates.created_at DESC`)
+      .orderBy(desc(graduates.createdAt))
       .limit(5),
   ]);
 
@@ -112,12 +115,14 @@ export default async function AdminDashboard() {
             <h2 className="text-lg font-semibold text-gray-900">
               Usuarios Recientes
             </h2>
-            <Link
-              href="/admin/users"
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Ver todos →
-            </Link>
+            {session?.role === 'admin' && (
+              <Link
+                href="/admin/users"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Ver todos →
+              </Link>
+            )}
           </div>
           <div className="divide-y divide-gray-100">
             {recentUsers.length > 0 ? (
@@ -226,56 +231,33 @@ export default async function AdminDashboard() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Acciones Rápidas
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link
-            href="/admin/posts/new"
-            className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
-          >
-            <div className="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center text-purple-700">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-purple-900">Nueva Noticia</p>
-              <p className="text-sm text-purple-600">Publicar anuncio</p>
-            </div>
-          </Link>
-
-          <Link
-            href="/admin/users"
-            className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-          >
-            <div className="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center text-blue-700">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-blue-900">Gestionar Usuarios</p>
-              <p className="text-sm text-blue-600">Administrar cuentas</p>
-            </div>
-          </Link>
+        <div className={`grid grid-cols-1 ${session?.role === 'admin' ? 'sm:grid-cols-2' : 'sm:grid-cols-1'} gap-4`}>
+          {session?.role === "admin" && (
+            <Link
+              href="/admin/users"
+              className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <div className="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center text-blue-700">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="font-medium text-blue-900">Gestionar Usuarios</p>
+                <p className="text-sm text-blue-600">Administrar cuentas</p>
+              </div>
+            </Link>
+          )}
 
           <Link
             href="/directorio"

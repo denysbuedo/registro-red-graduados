@@ -3,31 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-const UNIVERSITIES = [
-  "Universidad de La Habana",
-  "Universidad de Oriente",
-  "Universidad Central de Las Villas",
-  "Universidad de Camagüey",
-  "Universidad de Pinar del Río",
-  "Universidad de Holguín",
-  "Universidad de Granma",
-  "Universidad de Matanzas",
-  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
-  "Universidad de Ciencias Médicas de La Habana",
-  "Escuela Internacional de Educación Física y Deportes",
-  "Instituto Superior de Arte",
-  "Universidad de las Ciencias Informáticas",
-  "Otra",
-];
+import { UNIVERSITIES } from "@/lib/universities";
 
 const COUNTRIES = [
   "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
   "Costa Rica", "Cuba", "Ecuador", "El Salvador", "España", "Estados Unidos",
-  "Francia", "Guatemala", "Honduras", "Italia", "Jamaica", "México",
-  "Nicaragua", "Panamá", "Paraguay", "Perú", "República Dominicana",
+  "Francia", "Guatemala", "Guyana", "Haití", "Honduras", "Italia",
+  "Jamaica", "México", "Nicaragua", "Panamá", "Paraguay", "Perú",
+  "Puerto Rico", "República Dominicana", "Suriname", "Trinidad y Tobago",
   "Uruguay", "Venezuela", "Alemania", "Reino Unido", "Angola", "Mozambique",
-  "Sudáfrica", "Nigeria", "China", "Japón", "India", "Australia", "Otro",
+  "Sudáfrica", "Nigeria", "Argelia", "China", "Japón", "India",
+  "Australia", "Otro",
 ];
 
 export default function RegistroPage() {
@@ -42,21 +28,29 @@ export default function RegistroPage() {
 
     const formData = new FormData(e.currentTarget);
 
-    // Combine auth + graduate data in one request
     const data = {
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
       university: formData.get("university"),
       name: formData.get("name"),
+      birthDate: formData.get("birthDate"),
+      birthCountry: formData.get("birthCountry"),
       country: formData.get("country"),
+      passport: formData.get("passport") || null,
+      phone: formData.get("phone"),
       career: formData.get("career"),
       graduationYear: parseInt(formData.get("graduationYear") as string),
+      pregradoModalidad: formData.get("pregradoModalidad"),
+      postgradoUniversity: formData.get("postgradoUniversity") || null,
+      postgradoProgram: formData.get("postgradoProgram") || null,
+      postgradoYear: formData.get("postgradoYear") ? parseInt(formData.get("postgradoYear") as string) : null,
+      otherAcademicProgram: formData.get("otherAcademicProgram") || null,
+      otherCubanInstitution: formData.get("otherCubanInstitution") || null,
       currentProfession: formData.get("currentProfession"),
+      currentCompany: formData.get("currentCompany"),
       city: formData.get("city") || null,
-      currentCompany: formData.get("currentCompany") || null,
       bio: formData.get("bio") || null,
-      phone: formData.get("phone") || null,
       linkedin: formData.get("linkedin") || null,
       website: formData.get("website") || null,
       skills: formData.get("skills") || null,
@@ -78,7 +72,6 @@ export default function RegistroPage() {
         throw new Error(body.error || "Error al registrarse");
       }
 
-      // Redirect to pending page
       window.location.href = "/pendiente";
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error desconocido");
@@ -88,92 +81,166 @@ export default function RegistroPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">Registro de Egresado</h1>
-          <p className="text-gray-600 mt-2">Completa tus datos para unirte a la red</p>
+    <main className="min-h-screen bg-[#f8fafc] pb-32">
+      {/* Top Banner */}
+      <div className="bg-[#003f8f] h-[300px] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.4),transparent_50%)]"></div>
         </div>
+        <div className="max-w-4xl mx-auto px-4 pt-16 relative z-10 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">Unirse a la Red</h1>
+          <p className="text-blue-100 text-lg font-normal opacity-80">Registra tu trayectoria académica y profesional en Cuba</p>
+        </div>
+      </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Datos de acceso */}
-          <Section title="Datos de Acceso">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Username" name="username" required placeholder="Elige un username" />
-              <InputField label="Correo Electrónico" name="email" type="email" required placeholder="tu@email.com" />
-              <InputField label="Contraseña" name="password" type="password" required placeholder="Mínimo 6 caracteres" />
-            </div>
-          </Section>
-
-          {/* Información Personal */}
-          <Section title="Información Personal">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Nombre Completo" name="name" required placeholder="Juan Pérez García" />
-              <SelectField label="País de Residencia" name="country" required options={COUNTRIES} />
-              <InputField label="Ciudad" name="city" placeholder="Madrid" />
-            </div>
-          </Section>
-
-          {/* Formación */}
-          <Section title="Formación en Cuba">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <SelectField label="Universidad" name="university" required options={UNIVERSITIES} />
-              <InputField label="Carrera Estudiada" name="career" required placeholder="Ingeniería Informática" />
-              <InputField label="Año de Graduación" name="graduationYear" type="number" required min={1960} max={2030} placeholder="2020" />
-            </div>
-          </Section>
-
-          {/* Situación Profesional */}
-          <Section title="Situación Profesional Actual">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Profesión Actual" name="currentProfession" required placeholder="Desarrollador de Software" />
-              <InputField label="Empresa / Organización" name="currentCompany" placeholder="Tech Company S.A." />
-            </div>
-          </Section>
-
-          {/* Perfil y Enlaces */}
-          <Section title="Perfil y Enlaces">
-            <div className="space-y-4">
-              <TextAreaField label="Biografía" name="bio" placeholder="Cuéntanos sobre tu trayectoria..." rows={4} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InputField label="LinkedIn" name="linkedin" placeholder="https://linkedin.com/in/tuperfil" />
-                <InputField label="Sitio Web" name="website" placeholder="https://tusitio.com" />
+      <div className="max-w-4xl mx-auto px-4 -mt-24 relative z-20">
+        <div className="bg-white rounded-[3rem] shadow-2xl shadow-blue-900/10 border border-gray-100 p-8 sm:p-12">
+          {error && (
+            <div className="mb-10 p-6 bg-rose-50 border border-rose-100 rounded-[2rem] text-rose-700 text-sm font-medium flex items-center gap-4">
+              <div className="w-10 h-10 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 shrink-0">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
               </div>
-              <InputField label="Habilidades" name="skills" placeholder="JavaScript, Gestión (separadas por coma)" />
-              <InputField label="Idiomas" name="languages" placeholder="Español, Inglés (separados por coma)" />
-              <InputField label="Intereses" name="interests" placeholder="Tecnología, Salud (separados por coma)" />
+              {error}
             </div>
-          </Section>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
-          >
-            {loading ? "Registrando..." : "Enviar Registro"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-16">
+            
+            {/* Sección 1: Seguridad */}
+            <FormSection title="Credenciales de Acceso" icon={<LockIcon />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <InputField label="Nombre de Usuario" name="username" required placeholder="Elegir username" />
+                <InputField label="Correo Electrónico" name="email" type="email" required placeholder="ejemplo@correo.com" />
+                <div className="sm:col-span-2">
+                   <InputField label="Contraseña" name="password" type="password" required placeholder="Mínimo 6 caracteres" />
+                </div>
+              </div>
+            </FormSection>
 
-        <div className="mt-6 text-center">
-          <Link href="/login" className="text-[#003f8f] hover:underline text-sm">
-            ← Ya tengo cuenta
-          </Link>
+            {/* Sección 2: Personal */}
+            <FormSection title="Información de Identidad" icon={<UserIcon />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="sm:col-span-2">
+                  <InputField label="Nombre y Apellidos (Obligatorio)" name="name" required placeholder="Nombre completo según documento" />
+                </div>
+                <InputField label="Fecha de Nacimiento" name="birthDate" type="date" required />
+                <SelectField label="País de Nacimiento" name="birthCountry" required options={COUNTRIES} />
+                <SelectField label="País donde Reside" name="country" required options={COUNTRIES} />
+                <InputField label="Número de Pasaporte" name="passport" placeholder="Opcional" />
+                <InputField label="Teléfono (WhatsApp/WeChat/Telegram)" name="phone" required placeholder="+1 ..." />
+                <div className="sm:col-span-2">
+                  <InputField label="URL Foto de Perfil" name="photoUrl" placeholder="https://..." />
+                </div>
+              </div>
+            </FormSection>
+
+            {/* Sección 3: Académica Pregrado */}
+            <FormSection title="Formación de Pregrado en Cuba" icon={<AcademicIcon />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="sm:col-span-2">
+                  <SelectField label="IES Cubana de estudios" name="university" required options={UNIVERSITIES} />
+                </div>
+                <InputField label="Carrera cursada" name="career" required placeholder="Ej: Medicina, Ingeniería..." />
+                <InputField label="Año de Graduación" name="graduationYear" type="number" required min={1960} max={2030} placeholder="2020" />
+                <div className="sm:col-span-2">
+                  <SelectField 
+                    label="Modalidad de Estudios" 
+                    name="pregradoModalidad" 
+                    required 
+                    options={[
+                      { value: "becario", label: "Becario" },
+                      { value: "financiado_gobierno", label: "Financiado por Gobierno" },
+                      { value: "autofinanciado", label: "Autofinanciado" }
+                    ]} 
+                  />
+                </div>
+              </div>
+            </FormSection>
+
+            {/* Sección 4: Académica Postgrado */}
+            <FormSection title="Formación de Postgrado (Si aplica)" icon={<AcademicIcon />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="sm:col-span-2">
+                  <SelectField label="IES de Postgrado" name="postgradoUniversity" options={UNIVERSITIES} />
+                </div>
+                <SelectField 
+                  label="Tipo de Programa" 
+                  name="postgradoProgram" 
+                  options={[
+                    { value: "maestria", label: "Maestría" },
+                    { value: "doctorado", label: "Doctorado" },
+                    { value: "especialidad", label: "Especialidad Médica/Técnica" }
+                  ]} 
+                />
+                <InputField label="Año de Graduación Postgrado" name="postgradoYear" type="number" min={1960} max={2030} />
+              </div>
+            </FormSection>
+
+            {/* Sección 5: Profesional */}
+            <FormSection title="Situación Profesional Actual" icon={<BriefcaseIcon />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <InputField label="Institución / Empresa" name="currentCompany" required placeholder="Lugar de trabajo actual" />
+                <InputField label="Cargo / Posición" name="currentProfession" required placeholder="Tu puesto de trabajo" />
+                <InputField label="Ciudad" name="city" placeholder="Ciudad de residencia actual" />
+              </div>
+            </FormSection>
+
+            {/* Sección 6: Redes */}
+            <FormSection title="Perfil Digital y Competencias" icon={<GlobeIcon />}>
+              <div className="space-y-6">
+                <TextAreaField label="Biografía Profesional" name="bio" placeholder="Cuéntanos un poco sobre tu trayectoria y logros..." rows={5} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <InputField label="LinkedIn URL" name="linkedin" placeholder="https://..." />
+                  <InputField label="Sitio Web / Blog" name="website" placeholder="https://..." />
+                </div>
+                <InputField label="Habilidades (Separadas por comas)" name="skills" placeholder="Ej: Investigación, Docencia, Gestión..." />
+                <InputField label="Idiomas" name="languages" placeholder="Español, Inglés..." />
+                <InputField label="Áreas de Interés" name="interests" placeholder="Cooperación, Ciencia, Salud..." />
+              </div>
+            </FormSection>
+
+            <div className="pt-10">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 bg-[#003f8f] hover:bg-[#002e6a] disabled:bg-gray-200 text-white rounded-[2rem] font-bold uppercase tracking-[0.2em] text-sm transition-all shadow-2xl shadow-blue-900/20 active:scale-[0.98] flex items-center justify-center gap-4"
+              >
+                {loading ? (
+                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <span>Completar Registro</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </>
+                )}
+              </button>
+              
+              <div className="mt-8 text-center">
+                <Link href="/login" className="text-gray-400 hover:text-blue-600 font-semibold uppercase tracking-widest text-xs transition-colors">
+                  ← Ya soy parte de la red
+                </Link>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </main>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function FormSection({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
+    <div className="relative">
+      <div className="flex items-center gap-4 mb-10">
+        <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#003f8f]">
+          {icon}
+        </div>
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h2>
+      </div>
       {children}
     </div>
   );
@@ -181,9 +248,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function InputField({ label, name, type = "text", required, placeholder, min, max }: any) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-        {label}{required && <span className="text-red-500 ml-1">*</span>}
+    <div className="space-y-2">
+      <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">
+        {label}{required && <span className="text-rose-500 ml-1">*</span>}
       </label>
       <input
         name={name}
@@ -192,7 +259,7 @@ function InputField({ label, name, type = "text", required, placeholder, min, ma
         placeholder={placeholder}
         min={min}
         max={max}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
+        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none placeholder-gray-300"
       />
     </div>
   );
@@ -200,34 +267,65 @@ function InputField({ label, name, type = "text", required, placeholder, min, ma
 
 function SelectField({ label, name, required, options }: any) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-        {label}{required && <span className="text-red-500 ml-1">*</span>}
+    <div className="space-y-2">
+      <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">
+        {label}{required && <span className="text-rose-500 ml-1">*</span>}
       </label>
-      <select
-        name={name}
-        required={required}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
-      >
-        <option value="">Seleccionar...</option>
-        {options.map((opt: string) => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          name={name}
+          required={required}
+          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none appearance-none cursor-pointer"
+        >
+          <option value="" className="text-gray-400">Seleccionar opción...</option>
+          {options.map((opt: any) => {
+            const value = typeof opt === 'string' ? opt : opt.value;
+            const labelText = typeof opt === 'string' ? opt : opt.label;
+            return <option key={value} value={value}>{labelText}</option>;
+          })}
+        </select>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }
 
 function TextAreaField({ label, name, placeholder, rows = 3 }: any) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+    <div className="space-y-2">
+      <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest ml-1">{label}</label>
       <textarea
         name={name}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm resize-none"
+        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-medium focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none resize-none placeholder-gray-300"
       />
     </div>
   );
+}
+
+// --- Icons ---
+
+function LockIcon() {
+  return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>;
+}
+
+function UserIcon() {
+  return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
+}
+
+function AcademicIcon() {
+  return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>;
+}
+
+function BriefcaseIcon() {
+  return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+}
+
+function GlobeIcon() {
+  return <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>;
 }
