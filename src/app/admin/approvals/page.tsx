@@ -9,6 +9,7 @@ interface PendingUser {
   role: string;
   status: string;
   createdAt: Date | null;
+  graduateId: number | null;
   graduateName: string | null;
   graduateUniversity: string | null;
   graduateCountry: string | null;
