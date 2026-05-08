@@ -145,7 +145,7 @@ export default async function DirectorioPage({
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
                 {session.role === "institution" ? `Graduados de ${session.institutionName}` : "Directorio Global"}
               </h1>
               <p className="text-blue-100 text-lg font-medium max-w-2xl">
@@ -155,8 +155,8 @@ export default async function DirectorioPage({
             </div>
             <div className="hidden lg:block">
               <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10">
-                <p className="text-white text-3xl font-black">{allGraduates.length}</p>
-                <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">Egresados Registrados</p>
+                <p className="text-white text-2xl font-bold">{allGraduates.length}</p>
+                <p className="text-blue-200 text-[10px] font-bold uppercase tracking-widest">Egresados Registrados</p>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default async function DirectorioPage({
                   name="search"
                   defaultValue={search}
                   placeholder="Buscar por nombre, cargo o palabras clave..."
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-bold placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-semibold placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all outline-none"
                 />
                 <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -182,7 +182,7 @@ export default async function DirectorioPage({
               </div>
               <button
                 type="submit"
-                className="px-10 py-4 bg-[#003f8f] hover:bg-[#002e6a] text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-blue-900/20 active:scale-95"
+                className="px-10 py-4 bg-[#003f8f] hover:bg-[#002e6a] text-white rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl shadow-blue-900/20 active:scale-95"
               >
                 Filtrar Resultados
               </button>
@@ -254,7 +254,7 @@ export default async function DirectorioPage({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">Sin coincidencias</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 tracking-tight">Sin coincidencias</h3>
               <p className="text-gray-500 font-medium mb-8 max-w-md mx-auto">
                 No hemos encontrado egresados con esos criterios. Prueba ampliando tu búsqueda o eliminando algunos filtros.
               </p>

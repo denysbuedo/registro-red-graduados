@@ -106,7 +106,7 @@ export function GraduateCard({
       <div className="relative flex items-center gap-5">
         {/* Avatar */}
         <div className="relative shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#003f8f] to-[#0052bd] flex items-center justify-center text-white font-black text-xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-500">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#003f8f] to-[#0052bd] flex items-center justify-center text-white font-bold text-xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-500">
             {photoUrl ? (
               <img
                 src={photoUrl}
@@ -123,10 +123,10 @@ export function GraduateCard({
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <h3 className="text-gray-900 font-extrabold text-lg tracking-tight group-hover:text-[#003f8f] transition-colors truncate mb-1">
+          <h3 className="text-gray-900 font-bold text-lg tracking-tight group-hover:text-[#003f8f] transition-colors truncate mb-1">
             {name}
           </h3>
-          <p className="text-gray-500 font-medium text-sm truncate leading-tight">
+          <p className="text-gray-500 font-normal text-sm truncate leading-tight">
             {currentProfession}
           </p>
           {currentCompany && (
@@ -139,28 +139,28 @@ export function GraduateCard({
 
       {/* Meta Information Badges */}
       <div className="mt-6 flex flex-wrap gap-2">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[11px] font-black uppercase tracking-wider border border-slate-100">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-slate-100">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
           {country}
         </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/50 text-blue-700 rounded-xl text-[11px] font-black uppercase tracking-wider border border-blue-50">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/50 text-blue-700 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-blue-50">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
           </svg>
-          {university.split(" ").slice(0, 3).join(" ")}...
+          {university.split(" ").slice(0, 3).join(" ")}
         </span>
       </div>
 
       {/* Career Info */}
       <div className="mt-4 pt-4 border-t border-gray-50">
         <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter mb-1">Formación</p>
-        <p className="text-gray-700 text-sm font-bold truncate">
+        <p className="text-gray-700 text-sm font-semibold truncate">
           {career}
         </p>
-        <p className="text-gray-400 text-[10px] font-black mt-0.5">PROMOCIÓN {graduationYear}</p>
+        <p className="text-gray-400 text-[9px] font-bold mt-0.5">PROMOCIÓN {graduationYear}</p>
       </div>
 
       {/* Connection Action */}
@@ -172,7 +172,7 @@ export function GraduateCard({
             <button
               onClick={handleConnect}
               disabled={loading}
-              className="w-full py-3 bg-[#003f8f] hover:bg-[#002e6a] text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-900/10 active:scale-95 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#003f8f] hover:bg-[#002e6a] text-white text-xs font-bold uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-900/10 active:scale-95 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

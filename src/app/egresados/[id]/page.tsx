@@ -148,7 +148,7 @@ export default async function GraduateProfilePage({
               {/* Información Principal */}
               <div className="flex-1 text-center md:text-left pt-2">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                     {graduate.name}
                   </h1>
                   <span className="inline-flex items-center px-4 py-1 bg-blue-50 text-[#003f8f] rounded-full text-xs font-bold uppercase tracking-widest border border-blue-100">
@@ -156,7 +156,7 @@ export default async function GraduateProfilePage({
                   </span>
                 </div>
                 
-                <p className="text-xl sm:text-2xl font-medium text-gray-600 mb-6 flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <p className="text-lg sm:text-xl font-medium text-gray-600 mb-6 flex flex-wrap items-center justify-center md:justify-start gap-2">
                   <span className="text-blue-600">{graduate.currentProfession}</span>
                   {graduate.currentCompany && <span className="text-gray-400">en <span className="text-gray-700">{graduate.currentCompany}</span></span>}
                 </p>
@@ -231,7 +231,7 @@ export default async function GraduateProfilePage({
           {/* Biografía / Sobre mí */}
           {graduate.bio && (
             <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 border border-gray-100 shadow-xl shadow-slate-200/50">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
                   <StarIcon />
                 </div>
@@ -248,7 +248,7 @@ export default async function GraduateProfilePage({
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-[5rem] -mr-16 -mt-16 opacity-50"></div>
             
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+            <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
                 <AcademicIcon />
               </div>
@@ -260,7 +260,7 @@ export default async function GraduateProfilePage({
               <div className="relative pl-8 border-l-2 border-blue-100">
                 <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-600 rounded-full border-4 border-white"></div>
                 <div className="mb-1">
-                  <span className="text-xs font-black uppercase tracking-widest text-blue-600">Pregrado</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">Pregrado</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">{graduate.career}</h3>
                 <p className="text-gray-700 font-medium">{graduate.university}</p>
@@ -275,7 +275,7 @@ export default async function GraduateProfilePage({
                 <div className="relative pl-8 border-l-2 border-indigo-100">
                   <div className="absolute -left-[9px] top-0 w-4 h-4 bg-indigo-600 rounded-full border-4 border-white"></div>
                   <div className="mb-1">
-                    <span className="text-xs font-black uppercase tracking-widest text-indigo-600">Postgrado</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">Postgrado</span>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 capitalize">{graduate.postgradoProgram}</h3>
                   <p className="text-gray-700 font-medium">{graduate.postgradoUniversity}</p>
@@ -375,8 +375,8 @@ function Badge({ icon, text, color }: { icon: React.ReactNode; text: string; col
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-1">{label}</p>
-      <p className="text-gray-900 font-bold">{value}</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-1">{label}</p>
+      <p className="text-gray-900 font-semibold">{value}</p>
     </div>
   );
 }
