@@ -4,7 +4,12 @@ const { join } = require("path");
 
 console.log("🛡️  Crear Administrador - Red de Egresados\n");
 
-const sqlite = new Database(join(__dirname, "..", "dev.db"));
+// Detectar base de datos según el entorno
+const dbName = process.env.NODE_ENV === "production" ? "prod.db" : "dev.db";
+const dbPath = join(__dirname, "..", dbName);
+console.log(`📂 Usando base de datos: ${dbName}`);
+
+const sqlite = new Database(dbPath);
 
 // Datos del admin
 const username = "dinfo";
