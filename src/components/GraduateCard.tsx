@@ -12,6 +12,7 @@ interface GraduateCardProps {
   career: string | null;
   graduationYear: number | null;
   postgraduate?: { program: string; university: string; year: number } | null;
+  isPostgraduateOnly?: boolean;
   currentProfession: string;
   currentCompany?: string | null;
   photoUrl?: string | null;
@@ -25,6 +26,7 @@ export function GraduateCard({
   career,
   graduationYear,
   postgraduate,
+  isPostgraduateOnly,
   currentProfession,
   currentCompany,
   photoUrl,
@@ -140,7 +142,7 @@ export function GraduateCard({
       </div>
 
           <div className="flex flex-col mt-6 mb-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
-            {university ? (
+            {!isPostgraduateOnly && university ? (
               <>
                 <div className="flex items-start gap-2 mb-2">
                   <span className="text-blue-500 mt-0.5">🎓</span>

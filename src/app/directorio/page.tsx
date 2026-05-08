@@ -53,6 +53,7 @@ export default async function DirectorioPage({
       currentProfession: graduates.currentProfession,
       currentCompany: graduates.currentCompany,
       photoUrl: graduates.photoUrl,
+      pregradoModalidad: graduates.pregradoModalidad,
     })
     .from(graduates)
     .innerJoin(users, eq(graduates.userId, users.id))
@@ -280,6 +281,7 @@ export default async function DirectorioPage({
                       currentCompany={g.currentCompany}
                       photoUrl={g.photoUrl}
                       postgraduate={firstPostgrad}
+                      isPostgraduateOnly={!g.pregradoModalidad}
                     />
                   );
                 })}

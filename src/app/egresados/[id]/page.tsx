@@ -162,8 +162,8 @@ export default async function GraduateProfilePage({
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                   <Badge icon={<LocationIcon />} text={graduate.country} color="blue" />
-                  <Badge icon={<UniversityIcon />} text={graduate.university || (graduate.postgraduates?.[0]?.university) || "—"} color="indigo" />
-                  <Badge icon={<CalendarIcon />} text={graduate.graduationYear ? `Clase de ${graduate.graduationYear}` : (graduate.postgraduates?.[0]?.year ? `Postgrado ${graduate.postgraduates[0].year}` : "—")} color="slate" />
+                  <Badge icon={<UniversityIcon />} text={graduate.university || "—"} color="indigo" />
+                  <Badge icon={<CalendarIcon />} text={graduate.pregradoModalidad ? `Clase de ${graduate.graduationYear}` : `Postgrado ${graduate.graduationYear}`} color="slate" />
                 </div>
               </div>
 
@@ -256,7 +256,7 @@ export default async function GraduateProfilePage({
 
             <div className="space-y-10">
               {/* Pregrado */}
-              {graduate.university && (
+              {graduate.pregradoModalidad && (
                 <div className="relative pl-8 border-l-2 border-blue-100">
                   <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-600 rounded-full border-4 border-white"></div>
                   <div className="mb-1">
