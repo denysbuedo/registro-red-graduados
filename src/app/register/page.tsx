@@ -44,6 +44,13 @@ export default function RegistroPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
+    const hasUndergrad = formData.get("university") && formData.get("career") && formData.get("graduationYear");
+    
+    if (!hasUndergrad && postgraduates.length === 0) {
+      setError("Debe registrar al menos su formación de Pregrado o un programa de Posgrado.");
+      setLoading(false);
+      return;
+    }
 
     const data = {
       username: formData.get("username"),
@@ -166,18 +173,17 @@ export default function RegistroPage() {
             </FormSection>
 
             {/* Sección 3: Académica Pregrado */}
-            <FormSection title="Formación de Pregrado en Cuba" icon={<AcademicIcon />}>
+            <FormSection title="Formación de Pregrado en Cuba (Opcional si tiene Posgrado)" icon={<AcademicIcon />}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="sm:col-span-2">
-                  <SelectField label="IES Cubana de estudios" name="university" required options={UNIVERSITIES} />
+                  <SelectField label="IES Cubana de estudios" name="university" options={UNIVERSITIES} />
                 </div>
-                <InputField label="Carrera cursada" name="career" required placeholder="Ej: Medicina, Ingeniería..." />
-                <InputField label="Año de Graduación" name="graduationYear" type="number" required min={1960} max={2030} placeholder="2020" />
+                <InputField label="Carrera cursada" name="career" placeholder="Ej: Medicina, Ingeniería..." />
+                <InputField label="Año de Graduación" name="graduationYear" type="number" min={1960} max={2030} placeholder="2020" />
                 <div className="sm:col-span-2">
                   <SelectField 
                     label="Modalidad de Estudios" 
                     name="pregradoModalidad" 
-                    required 
                     options={[
                       { value: "becario", label: "Becario" },
                       { value: "financiado_gobierno", label: "Financiado por Gobierno" },

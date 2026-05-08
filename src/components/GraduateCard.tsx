@@ -8,9 +8,10 @@ interface GraduateCardProps {
   id: number;
   name: string;
   country: string;
-  university: string;
-  career: string;
-  graduationYear: number;
+  university: string | null;
+  career: string | null;
+  graduationYear: number | null;
+  postgraduate?: { program: string; university: string; year: number } | null;
   currentProfession: string;
   currentCompany?: string | null;
   photoUrl?: string | null;
@@ -23,6 +24,7 @@ export function GraduateCard({
   university,
   career,
   graduationYear,
+  postgraduate,
   currentProfession,
   currentCompany,
   photoUrl,
@@ -136,6 +138,53 @@ export function GraduateCard({
           )}
         </div>
       </div>
+
+          <div className="flex flex-col mt-6 mb-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+            {university ? (
+              <>
+                <div className="flex items-start gap-2 mb-2">
+                  <span className="text-blue-500 mt-0.5">🎓</span>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Universidad</p>
+                    <p className="text-xs font-semibold text-gray-700 leading-tight">{university}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-500 mt-0.5">📚</span>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Especialidad</p>
+                    <p className="text-xs font-semibold text-gray-700 leading-tight">
+                      {career} <span className="text-gray-400 font-normal">({graduationYear})</span>
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : postgraduate ? (
+              <>
+                <div className="flex items-start gap-2 mb-2">
+                  <span className="text-purple-500 mt-0.5">🎓</span>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Universidad (Posgrado)</p>
+                    <p className="text-xs font-semibold text-gray-700 leading-tight">{postgraduate.university}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-purple-500 mt-0.5">📘</span>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Programa</p>
+                    <p className="text-xs font-semibold text-gray-700 leading-tight">
+                      {postgraduate.program} <span className="text-gray-400 font-normal">({postgraduate.year})</span>
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-start gap-2">
+                <span className="text-gray-400 mt-0.5">🎓</span>
+                <p className="text-xs font-medium text-gray-500 italic">Información académica no disponible</p>
+              </div>
+            )}
+          </div>
 
       {/* Meta Information Badges */}
       <div className="mt-6 flex flex-wrap gap-2">

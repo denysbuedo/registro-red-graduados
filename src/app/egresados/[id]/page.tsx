@@ -162,8 +162,8 @@ export default async function GraduateProfilePage({
 
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                   <Badge icon={<LocationIcon />} text={graduate.country} color="blue" />
-                  <Badge icon={<UniversityIcon />} text={graduate.university} color="indigo" />
-                  <Badge icon={<CalendarIcon />} text={`Clase de ${graduate.graduationYear}`} color="slate" />
+                  <Badge icon={<UniversityIcon />} text={graduate.university || (graduate.postgraduates?.[0]?.university) || "—"} color="indigo" />
+                  <Badge icon={<CalendarIcon />} text={graduate.graduationYear ? `Clase de ${graduate.graduationYear}` : (graduate.postgraduates?.[0]?.year ? `Postgrado ${graduate.postgraduates[0].year}` : "—")} color="slate" />
                 </div>
               </div>
 
@@ -256,18 +256,22 @@ export default async function GraduateProfilePage({
 
             <div className="space-y-10">
               {/* Pregrado */}
-              <div className="relative pl-8 border-l-2 border-blue-100">
-                <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-600 rounded-full border-4 border-white"></div>
-                <div className="mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">Pregrado</span>
+              {graduate.university && (
+                <div className="relative pl-8 border-l-2 border-blue-100">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-600 rounded-full border-4 border-white"></div>
+                  <div className="mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">Pregrado</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">{graduate.career}</h3>
+                  <p className="text-gray-700 font-medium">{graduate.university}</p>
+                  <div className="mt-3 flex gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> Graduado en {graduate.graduationYear}</span>
+                    {graduate.pregradoModalidad && (
+                      <span className="flex items-center gap-1 capitalize"><div className="w-2 h-2 rounded-full bg-green-400"></div> {graduate.pregradoModalidad?.replace("_", " ")}</span>
+                    )}
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{graduate.career}</h3>
-                <p className="text-gray-700 font-medium">{graduate.university}</p>
-                <div className="mt-3 flex gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1"><CalendarIcon className="w-4 h-4" /> Graduado en {graduate.graduationYear}</span>
-                  <span className="flex items-center gap-1 capitalize"><div className="w-2 h-2 rounded-full bg-green-400"></div> {graduate.pregradoModalidad?.replace("_", " ")}</span>
-                </div>
-              </div>
+              )}
 
               {/* Postgrados Múltiples */}
               {graduate.postgraduates && graduate.postgraduates.length > 0 && (

@@ -18,13 +18,27 @@ export async function POST(request: NextRequest) {
       bio, photoUrl, linkedin, website, skills, languages, interests
     } = body;
 
-    // Validaciones básicas
-    if (!username || !email || !password || !university || !name || !birthDate || !birthCountry || !phone || !career || !graduationYear || !currentProfession || !currentCompany) {
+    // Validaciones básicas de campos obligatorios
+    if (!username || !email || !password || !name || !birthDate || !birthCountry || !phone || !currentProfession || !currentCompany) {
       return NextResponse.json(
         { error: "Faltan campos obligatorios" },
         { status: 400 }
       );
     }
+
+    // Validación de formación académica: al menos pregrado o posgrado
+    const hasUndergrad = university && career && graduationYear;
+    const hasPostgrad = postgraduates && Array.isArray(postgraduates) && postgraduates.length > 0;
+    
+    if (!hasUndergrad && !hasPostgrad) {
+      return NextResponse.json(
+        { error: "Debe proporcionar información de al menos un programa académico (Pregrado o Posgrado)" },
+        { status: 400 }
+      );
+    }
+
+    // Determinar qué universidad debe validar el perfil
+    const validatingUniversity = hasUndergrad ? university : postgraduates[0].university;
 
     // Verificar si el username o email ya existen
     const existingUser = await db
@@ -52,7 +66,7 @@ export async function POST(request: NextRequest) {
         passwordHash,
         role: "user",
         status: "pending",
-        pendingUniversity: university,
+        pendingUniversity: validatingUniversity,
       })
       .returning();
 
@@ -70,10 +84,10 @@ export async function POST(request: NextRequest) {
         country,
         passport,
         phone,
-        university,
-        career,
-        graduationYear,
-        pregradoModalidad: pregradoModalidad as any,
+        university: university || (postgraduates?.[0]?.university) || null,
+        career: career || (postgraduates?.[0]?.program) || null,
+        graduationYear: graduationYear ? parseInt(graduationYear) : (postgraduates?.[0]?.year ? parseInt(postgraduates[0].year) : null),
+        pregradoModalidad: pregradoModalidad || null,
         otherAcademicProgram,
         otherCubanInstitution,
         currentProfession,

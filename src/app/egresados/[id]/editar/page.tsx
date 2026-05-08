@@ -80,6 +80,16 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
     setLoading(true);
     setError("");
 
+    const formData = new FormData(e.currentTarget);
+    const hasUndergrad = formData.get("university") && formData.get("career") && formData.get("graduationYear");
+    const hasPostgrad = postgraduates.length > 0;
+
+    if (!hasUndergrad && !hasPostgrad) {
+      setError("Debe proporcionar información de al menos un programa académico (Pregrado o Posgrado)");
+      setLoading(false);
+      return;
+    }
+
     const form = e.currentTarget;
     const data = {
       name: (form.elements.namedItem("name") as HTMLInputElement).value,
@@ -208,17 +218,16 @@ export default function EditarPerfilPage({ params }: { params: Promise<{ id: str
             </div>
           </FormSection>
 
-          <FormSection title="Formación en Cuba" icon={<AcademicIcon />}>
+          <FormSection title="Formación de Pregrado en Cuba (Opcional si tiene Posgrado)" icon={<AcademicIcon />}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <SelectField label="IES de Pregrado" name="university" required defaultValue={formData?.university} options={UNIVERSITIES} />
+                <SelectField label="IES de Pregrado" name="university" defaultValue={formData?.university} options={UNIVERSITIES} />
               </div>
-              <InputField label="Carrera cursada" name="career" required defaultValue={formData?.career} placeholder="Ej: Ingeniería Informática" />
-              <InputField label="Año de Graduación" name="graduationYear" type="number" required defaultValue={formData?.graduationYear} />
+              <InputField label="Carrera cursada" name="career" defaultValue={formData?.career} placeholder="Ej: Ingeniería Informática" />
+              <InputField label="Año de Graduación" name="graduationYear" type="number" defaultValue={formData?.graduationYear} />
               <SelectField 
                 label="Modalidad de Estudios" 
                 name="pregradoModalidad" 
-                required 
                 defaultValue={formData?.pregradoModalidad} 
                 options={[
                   { value: "becario", label: "Becario" },

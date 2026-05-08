@@ -1,14 +1,13 @@
 import { db } from "@/db";
 import { graduates, users } from "@/db/schema";
-import { sql, eq, and, like, or, desc } from "drizzle-orm";
+import { sql, eq, and, like, or, desc, inArray, isNotNull } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { GraduateCard } from "@/components/GraduateCard";
 import { APP_CONFIG } from "@/lib/config";
-
 import { getUniversitiesByMinistry, Ministry } from "@/lib/universities";
-import { inArray } from "drizzle-orm";
+import { graduatePostgraduates } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +109,19 @@ export default async function DirectorioPage({
     .limit(PAGE_SIZE)
     .offset(offset);
 
+  // Fetch postgraduates for these graduates
+  const graduateIds = allGraduates.map(g => g.id);
+  const allPostgrads = graduateIds.length > 0 
+    ? await db.select().from(graduatePostgraduates).where(inArray(graduatePostgraduates.graduateId, graduateIds)) 
+    : [];
+
+  // Group postgrads by graduateId
+  const postgradsByGraduate = allPostgrads.reduce((acc: any, pg) => {
+    if (!acc[pg.graduateId]) acc[pg.graduateId] = [];
+    acc[pg.graduateId].push(pg);
+    return acc;
+  }, {});
+
   const countriesResult = await db
     .selectDistinct({ country: graduates.country })
     .from(graduates)
@@ -128,6 +140,7 @@ export default async function DirectorioPage({
     .innerJoin(users, eq(graduates.userId, users.id))
     .where(and(
       eq(users.status, "approved"),
+      isNotNull(graduates.university),
       session.role === "dri" && session.ministry 
         ? inArray(graduates.university, getUniversitiesByMinistry(session.ministry as Ministry))
         : sql`1=1`
@@ -140,6 +153,7 @@ export default async function DirectorioPage({
     .innerJoin(users, eq(graduates.userId, users.id))
     .where(and(
       eq(users.status, "approved"),
+      isNotNull(graduates.career),
       session.role === "dri" && session.ministry 
         ? inArray(graduates.university, getUniversitiesByMinistry(session.ministry as Ministry))
         : sql`1=1`
@@ -249,20 +263,26 @@ export default async function DirectorioPage({
           {allGraduates.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {allGraduates.map((g) => (
-                  <GraduateCard
-                    key={g.id}
-                    id={g.id}
-                    name={g.name}
-                    country={g.country}
-                    university={g.university}
-                    career={g.career}
-                    graduationYear={g.graduationYear}
-                    currentProfession={g.currentProfession}
-                    currentCompany={g.currentCompany}
-                    photoUrl={g.photoUrl}
-                  />
-                ))}
+                {allGraduates.map((g) => {
+                  const graduatePostgrads = postgradsByGraduate[g.id] || [];
+                  const firstPostgrad = graduatePostgrads[0] || null;
+
+                  return (
+                    <GraduateCard
+                      key={g.id}
+                      id={g.id}
+                      name={g.name}
+                      country={g.country}
+                      university={g.university}
+                      career={g.career}
+                      graduationYear={g.graduationYear}
+                      currentProfession={g.currentProfession}
+                      currentCompany={g.currentCompany}
+                      photoUrl={g.photoUrl}
+                      postgraduate={firstPostgrad}
+                    />
+                  );
+                })}
               </div>
 
               {/* Controles de Paginación */}
