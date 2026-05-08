@@ -201,18 +201,11 @@ export function GraduateCard({
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
           </svg>
-          {university.split(" ").slice(0, 3).join(" ")}
+          {university?.split(" ").slice(0, 3).join(" ") || "—"}
         </span>
       </div>
 
-      {/* Career Info */}
-      <div className="mt-4 pt-4 border-t border-gray-50">
-        <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter mb-1">Formación</p>
-        <p className="text-gray-700 text-sm font-semibold truncate">
-          {career}
-        </p>
-        <p className="text-gray-400 text-[9px] font-bold mt-0.5">PROMOCIÓN {graduationYear}</p>
-      </div>
+
 
       {/* Connection Action */}
       {APP_CONFIG.features.connections && (
